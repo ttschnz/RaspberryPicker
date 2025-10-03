@@ -1,0 +1,6 @@
+[submodule "libraries/Servo"]
+	path = libraries/Servo
+	url = https://github.com/arduino-libraries/Servo
+[submodule "libraries/Stepper"]
+	path = libraries/Stepper
+	url = https://github.com/arduino-libraries/Stepper
