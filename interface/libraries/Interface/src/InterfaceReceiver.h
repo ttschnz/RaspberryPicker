@@ -1,14 +1,14 @@
 #ifndef RASPBERRY_INTERFACE_RECEIVER_H
 #define RASPBERRY_INTERFACE_RECEIVER_H
-
-typedef struct {
-    int rx;
-    int tx;
-} InterfacePinout;
+#include <ArduinoJson.h>
 
 class InterfaceReceiver {
     public:
-        InterfaceReceiver(InterfacePinout* pinout);
+        InterfaceReceiver();
+        void listen();
+        String get_state_json();
+    private:
+        JsonDocument state;
 };
 
 #endif

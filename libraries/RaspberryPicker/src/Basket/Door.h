@@ -1,8 +1,6 @@
 #ifndef RASPBERRY_PICKER_BASKET_DOOR_H
 #define RASPBERRY_PICKER_BASKET_DOOR_H
 
-#include "../Basket.h"
-
 /**
  * Door State:
  * - OPEN_LARGE: The door for large berries is open
@@ -14,6 +12,14 @@ enum class DoorState {
      OPEN_LARGE,
      CLOSED,
  };
+
+static const char* door_state_strings[] = {
+    "OPEN_SMALL",
+    "OPEN_LARGE",
+    "CLOSED"
+};
+
+const char* door_state_to_str(DoorState door_State);
 
 class DoorServoValues
 {

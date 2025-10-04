@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include <Servo.h>
 #include "Basket.h"
+#include "Basket/Door.h"
+#include "Basket/Sorting.h"
 
 const int SortingServoValues::small_pos = 0;
 const int SortingServoValues::idle_pos = 90;
@@ -12,7 +14,9 @@ const int DoorServoValues::closed_pos = 90;
 const int DoorServoValues::open_large_pos = 180;
 const int DoorServoValues::speed = 300;
 
-BasketController::BasketController(BasketPinout *pinout){
+BasketController::BasketController(BasketPinout *pinout,InterfaceSender *interface){
+    this->interface = interface;
+
     // Initialize fill count values to zero
     fill_count.fill_small = 0;
     fill_count.fill_large = 0;
@@ -52,7 +56,9 @@ void BasketController::set_door(DoorState target_state){
     int time_to_reach = (angular_distance * 1000) / DoorServoValues::speed; // [deg]/[deg/s]*[1000ms/s]=[ms]
     this->door_state = target_state;
     this->door_servo.write(target_position);
+    this->interface->send_state("door.state", door_state_to_str(target_state));
     delay(time_to_reach);
+    this->interface->send_state("door.position", target_position);
 }
 
 bool BasketController::reset_counter(){
@@ -62,9 +68,11 @@ bool BasketController::reset_counter(){
             break;
         case DoorState::OPEN_SMALL:
             this->fill_count.fill_small = 0;
+            this->interface->send_state("fill_count.small", this->fill_count.fill_small);
             break;
         case DoorState::OPEN_LARGE:
             this->fill_count.fill_large = 0;
+            this->interface->send_state("fill_count.large", this->fill_count.fill_large);
             break;
     }
     return true;
@@ -92,7 +100,9 @@ void BasketController::set_sorting(SortingState target_state){
     int angular_distance = abs(this->door_servo.read() - target_position);  // angular distance in degrees
     int time_to_reach = (angular_distance * 1000) / SortingServoValues::speed; // [deg]/[deg/s]*[1000ms/s]=[ms]
     this->sorting_state = target_state;
+    this->interface->send_state("sorting.state", sorting_state_to_str(target_state));
     this->sorting_servo.write(target_position);
+    this->interface->send_state("sorting.position", target_position);
     delay(time_to_reach);
 }
 
@@ -103,9 +113,11 @@ bool BasketController::increment_counter(){
             break;
         case SortingState::SMALL:
             this->fill_count.fill_small += 1;
+            this->interface->send_state("fill_count.small", this->fill_count.fill_small);
             break;
         case SortingState::LARGE:
             this->fill_count.fill_large += 1;
+            this->interface->send_state("fill_count.large", this->fill_count.fill_large);
             break;
     }
     return true;

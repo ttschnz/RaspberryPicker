@@ -1,7 +1,6 @@
 #ifndef RASPBERRY_PICKER_BASKET_SORTING_H
 #define RASPBERRY_PICKER_BASKET_SORTING_H
 
-#include "../Basket.h"
 /**
  * Sorting State:
  * - LARGE: The switcher is switched for large berries
@@ -13,6 +12,13 @@ enum class SortingState {
     SMALL,
     IDLE,
 } ;
+static const char* sorting_state_strings[] = {
+    "LARGE",
+    "SMALL",
+    "IDLE"
+};
+
+const char* sorting_state_to_str(SortingState sorting_state);
 
 class SortingServoValues
 {

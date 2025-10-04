@@ -6,6 +6,7 @@
 
 #include "Basket/Door.h"
 #include "Basket/Sorting.h"
+#include "InterfaceSender.h"
 
 /**
  * FillCount:
@@ -29,7 +30,7 @@ class BasketController {
         /**
         * Initialise the basket controller. Call during setup.
         */
-        BasketController(BasketPinout *pinout);
+        BasketController(BasketPinout *pinout, InterfaceSender *interface);
 
         /**
          * Reads the opening state from the position and last command
@@ -70,5 +71,6 @@ class BasketController {
         SortingState sorting_state;
         int door_pos;
         DoorState door_state;
+        InterfaceSender *interface;
 } ;
 #endif

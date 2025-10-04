@@ -18,7 +18,9 @@ const int PlateStepperMotorValues::measuring_interval = 1;
 const int PlateStepperMotorValues::plate_distance = 30;
 const int PlateStepperMotorValues::steps_per_revolution = 300;
 
-GripperController::GripperController(GripperPinout *pinout){
+GripperController::GripperController(GripperPinout *pinout,InterfaceSender *interface){
+    this->interface = interface;
+
     pinMode(pinout->color_sensor_pin, INPUT);
     pinMode(pinout->pressure_sensor_pin, INPUT);
     pinMode(pinout->resistance_sensor_pin, INPUT);

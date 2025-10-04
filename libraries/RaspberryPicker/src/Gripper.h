@@ -7,6 +7,7 @@
 #include "Gripper/PressureSensor.h"
 #include "Gripper/ResistanceSensor.h"
 #include "Gripper/PlateStepper.h"
+#include "InterfaceSender.h"
 
 typedef struct {
     int color_sensor_pin;
@@ -20,7 +21,7 @@ class GripperController{
         /**
         *
         */
-        GripperController(GripperPinout *pinout);
+        GripperController(GripperPinout *pinout,InterfaceSender *interface);
     private:
 
         ~GripperController() {
@@ -28,6 +29,7 @@ class GripperController{
         }
 
         Stepper *plate_stepper;
+        InterfaceSender *interface;
 
 };
 

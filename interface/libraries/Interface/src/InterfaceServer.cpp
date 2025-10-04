@@ -7,6 +7,9 @@
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncUDP.h>
 
+#include "static/index_html.h"
+
+#include "InterfaceReceiver.h"
 
 const char* InterfaceConfigValues::wifi_ssid = "RaspberryPicker12";
 const char* InterfaceConfigValues::wifi_password = "00000000";
@@ -14,7 +17,9 @@ const char* InterfaceConfigValues::server_hostname = "raspberrypicker";
 const int InterfaceConfigValues::dns_port = 53;
 
 
-InterfaceServer::InterfaceServer(){
+InterfaceServer::InterfaceServer(InterfaceReceiver *interface_receiver){
+    this->interface_receiver = interface_receiver;
+
     WiFi.hostname("esp8266device");
     WiFi.softAP(
         InterfaceConfigValues::wifi_ssid,
@@ -30,6 +35,10 @@ InterfaceServer::InterfaceServer(){
     this->server->on("/", HTTP_GET,
         [this](AsyncWebServerRequest *request){this->handle_root(request);}
     );
+    this->server->on("/api/state", HTTP_GET,
+        [this](AsyncWebServerRequest *request){this->handle_state(request);}
+    );
+
     this->server->begin();
 
     this->dns_server = new AsyncDNSServer();
@@ -45,6 +54,15 @@ void InterfaceServer::handle_root(AsyncWebServerRequest *request){
     request->send(
         200,
         "text/html",
-        "<html><body><h1>Welcome</h1></body></html>"
+        index_html
+    );
+}
+
+void InterfaceServer::handle_state(AsyncWebServerRequest *request){
+    String current_state = this->interface_receiver->get_state_json();
+    request->send(
+        200,
+        "application/json",
+        current_state
     );
 }

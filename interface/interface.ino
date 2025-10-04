@@ -4,17 +4,12 @@
 InterfaceServer* interface_server;
 InterfaceReceiver* interface_receiver;
 
-InterfacePinout interface_pinout{
-    rx: 9,
-    tx: 10
-};
-
 void setup() {
     delay(1000);
-    interface_server = new InterfaceServer();
-    interface_receiver = new InterfaceReceiver(&interface_pinout);
+    interface_receiver = new InterfaceReceiver();
+    interface_server = new InterfaceServer(interface_receiver);
 }
 
 void loop() {
-    delay(1000);
+    interface_receiver->listen();
 }

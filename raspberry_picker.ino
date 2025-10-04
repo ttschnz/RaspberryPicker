@@ -16,9 +16,10 @@ GripperPinout gripper_pinout {
     .stepper_motor_pins = {14,15,16,17},
 };
 
-InterfacePinout interface_pinout {
-    .rx = 3,
-    .tx = 4,
+InterfaceConfiguration interface_configuration {
+    .rx_pin = 3,
+    .tx_pin = 4,
+    .baud_rate = 9600,
 };
 
 BasketController* basket_controller;
@@ -26,11 +27,46 @@ GripperController* gripper_controller;
 InterfaceSender* interface_sender;
 
 void setup() {
-  basket_controller = new BasketController(&basket_pinout);
-  gripper_controller = new GripperController(&gripper_pinout);
-  interface_sender = new InterfaceSender(&interface_pinout);
+  interface_sender = new InterfaceSender(&interface_configuration);
+
+  basket_controller = new BasketController(&basket_pinout, interface_sender);
+  gripper_controller = new GripperController(&gripper_pinout, interface_sender);
 }
 
 void loop() {
-
+    basket_controller->set_door(DoorState::CLOSED);
+    basket_controller->set_sorting(SortingState::IDLE);
+    delay(1000);
+    basket_controller->set_sorting(SortingState::LARGE);
+    delay(1000);
+    basket_controller->set_sorting(SortingState::IDLE);
+    delay(1000);
+    basket_controller->set_sorting(SortingState::SMALL);
+    delay(1000);
+    basket_controller->increment_counter();
+    delay(100);
+    basket_controller->increment_counter();
+    delay(100);
+    basket_controller->increment_counter();
+    delay(100);
+    basket_controller->increment_counter();
+    delay(100);
+    basket_controller->increment_counter();
+    delay(100);
+    basket_controller->increment_counter();
+    delay(100);
+    basket_controller->increment_counter();
+    delay(1000);
+    basket_controller->set_door(DoorState::OPEN_LARGE);
+    basket_controller->reset_counter();
+    delay(1000);
+    basket_controller->set_door(DoorState::CLOSED);
+    basket_controller->reset_counter();
+    delay(1000);
+    basket_controller->set_door(DoorState::OPEN_SMALL);
+    basket_controller->reset_counter();
+    delay(1000);
+    basket_controller->set_door(DoorState::CLOSED);
+    basket_controller->reset_counter();
+    delay(1000);
 }
