@@ -1,6 +1,8 @@
-#include "Interface.h"
+#include "InterfaceServer.h"
+#include "InterfaceReceiver.h"
 
-Interface* interface;
+InterfaceServer* interface_server;
+InterfaceReceiver* interface_receiver;
 
 InterfacePinout interface_pinout{
     rx: 9,
@@ -9,7 +11,8 @@ InterfacePinout interface_pinout{
 
 void setup() {
     delay(1000);
-    interface = new Interface(&interface_pinout);
+    interface_server = new InterfaceServer();
+    interface_receiver = new InterfaceReceiver(&interface_pinout);
 }
 
 void loop() {

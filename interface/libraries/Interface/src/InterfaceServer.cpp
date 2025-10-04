@@ -1,4 +1,4 @@
-#include "Interface.h"
+#include "InterfaceServer.h"
 
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
@@ -14,7 +14,7 @@ const char* InterfaceConfigValues::server_hostname = "raspberrypicker";
 const int InterfaceConfigValues::dns_port = 53;
 
 
-Interface::Interface(InterfacePinout *interface_pinout){
+InterfaceServer::InterfaceServer(){
     WiFi.hostname("esp8266device");
     WiFi.softAP(
         InterfaceConfigValues::wifi_ssid,
@@ -41,7 +41,7 @@ Interface::Interface(InterfacePinout *interface_pinout){
 
 }
 
-void Interface::handle_root(AsyncWebServerRequest *request){
+void InterfaceServer::handle_root(AsyncWebServerRequest *request){
     request->send(
         200,
         "text/html",

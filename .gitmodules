@@ -19,3 +19,9 @@
 [submodule "interface/libraries/ESPAsyncUDP"]
 	path = interface/libraries/ESPAsyncUDP
 	url = https://github.com/me-no-dev/ESPAsyncUDP
+[submodule "interface/libraries/ArduinoSTL"]
+	path = interface/libraries/ArduinoSTL
+	url = https://github.com/mike-matera/ArduinoSTL
+[submodule "libraries/ArduinoSTL"]
+	path = libraries/ArduinoSTL
+	url = https://github.com/mike-matera/ArduinoSTL

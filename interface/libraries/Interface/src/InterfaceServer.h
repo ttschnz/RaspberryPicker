@@ -17,15 +17,10 @@ class InterfaceConfigValues
         static const int dns_port;
 };
 
-typedef struct {
-    int rx;
-    int tx;
-} InterfacePinout;
-
-class Interface
+class InterfaceServer
 {
     public:
-        Interface(InterfacePinout* pinout);
+        InterfaceServer();
 
     private:
         AsyncWebServer *server;
