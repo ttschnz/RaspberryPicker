@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module fritzingVersion="1.0.4.." icon="Temp.png">
+    <title>ME-320</title>
+    <instances>
+        <instance moduleIdRef="28byj-48-driver_roboteach_es_1" modelIndex="5792" path="/home/tim/Fritzing/parts/contrib/28byj-48-driver_roboteach_es_1.fzp">
+            <views/>
+        </instance>
+        <instance moduleIdRef="28BYJ-48_roboteach_es_1" modelIndex="5794" path="/home/tim/Fritzing/parts/contrib/28BYJ-48_roboteach_es_1.fzp">
+            <views/>
+        </instance>
+    </instances>
+</module>
