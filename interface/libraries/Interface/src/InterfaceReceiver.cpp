@@ -22,6 +22,15 @@ void InterfaceReceiver::listen(){
       }
 }
 
+void InterfaceReceiver::request_state_change(String key, String value){
+    String data_buffer;
+    data_buffer.concat(key);
+    data_buffer.concat("=");
+    data_buffer.concat(value);
+
+    Serial.println(data_buffer);
+}
+
 String InterfaceReceiver::get_state_json(){
     String state;
     serializeJsonPretty(this->state, state);

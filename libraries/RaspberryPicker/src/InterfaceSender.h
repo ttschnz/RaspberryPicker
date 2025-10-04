@@ -10,6 +10,9 @@ typedef struct {
     int baud_rate;
 } InterfaceConfiguration;
 
+class BasketController;
+class GripperController;
+
 class InterfaceSender {
     public:
         InterfaceSender(InterfaceConfiguration* config);
@@ -23,8 +26,13 @@ class InterfaceSender {
 
                 this->Serial->println(data_buffer);
             };
+
+        void listen_state_change_requests();
+        void add_controllers(BasketController* basket_controller,GripperController* gripper_controller);
     private:
         SoftwareSerial* Serial;
+        BasketController* basket_controller;
+        GripperController* gripper_controller;
 };
 
 #endif

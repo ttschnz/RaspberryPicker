@@ -19,7 +19,8 @@ static const char* door_state_strings[] = {
     "CLOSED"
 };
 
-const char* door_state_to_str(DoorState door_State);
+const char* door_state_to_str(DoorState door_state);
+bool str_to_door_state(String door_state_str, DoorState* out_door_state);
 
 class DoorServoValues
 {

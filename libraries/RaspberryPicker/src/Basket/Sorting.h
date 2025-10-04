@@ -1,6 +1,6 @@
 #ifndef RASPBERRY_PICKER_BASKET_SORTING_H
 #define RASPBERRY_PICKER_BASKET_SORTING_H
-
+#include <Arduino.h>
 /**
  * Sorting State:
  * - LARGE: The switcher is switched for large berries
@@ -19,6 +19,7 @@ static const char* sorting_state_strings[] = {
 };
 
 const char* sorting_state_to_str(SortingState sorting_state);
+bool str_to_sorting_state(String sorting_state_str, SortingState* out_sorting_state);
 
 class SortingServoValues
 {

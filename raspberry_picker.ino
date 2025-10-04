@@ -31,9 +31,12 @@ void setup() {
 
   basket_controller = new BasketController(&basket_pinout, interface_sender);
   gripper_controller = new GripperController(&gripper_pinout, interface_sender);
+
+  interface_sender->add_controllers(basket_controller, gripper_controller);
 }
 
 void loop() {
+    interface_sender->listen_state_change_requests();
     basket_controller->set_door(DoorState::CLOSED);
     basket_controller->set_sorting(SortingState::IDLE);
     delay(1000);

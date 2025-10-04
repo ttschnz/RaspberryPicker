@@ -30,7 +30,8 @@ class InterfaceServer
         IPAddress my_ip;
         InterfaceReceiver *interface_receiver;
         void handle_root(AsyncWebServerRequest *request);
-        void handle_state(AsyncWebServerRequest *request);
+        void handle_state_get(AsyncWebServerRequest *request);
+        void handle_state_post(AsyncWebServerRequest *request);
 };
 
 

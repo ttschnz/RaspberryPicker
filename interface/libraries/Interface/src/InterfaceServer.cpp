@@ -38,6 +38,9 @@ InterfaceServer::InterfaceServer(InterfaceReceiver *interface_receiver){
     this->server->on("/api/state", HTTP_GET,
         [this](AsyncWebServerRequest *request){this->handle_state(request);}
     );
+    this->server->on("/api/state", HTTP_POST,
+        [this](AsyncWebServerRequest *request){this->set_state(request);}
+    );
 
     this->server->begin();
 
@@ -58,11 +61,34 @@ void InterfaceServer::handle_root(AsyncWebServerRequest *request){
     );
 }
 
-void InterfaceServer::handle_state(AsyncWebServerRequest *request){
+void InterfaceServer::handle_state_get(AsyncWebServerRequest *request){
     String current_state = this->interface_receiver->get_state_json();
     request->send(
         200,
         "application/json",
         current_state
     );
+}
+
+void InterfaceServer::handle_state_post(AsyncWebServerRequest *request){
+    if (!request->hasParam("key", true, false)){
+        request->send(
+            422,
+            "application/json",
+            R"rawliteral({"error":"missing key"})rawliteral"
+        );
+        return;
+    }
+    if (!request->hasParam("value", true, false)){
+        request->send(
+            422,
+            "application/json",
+            R"rawliteral({"error":"missing value"})rawliteral"
+        );
+        return;
+    }
+    String key = request->getParam("key", true, false);
+    String value = request->getParam("value", true, false);
+
+
 }

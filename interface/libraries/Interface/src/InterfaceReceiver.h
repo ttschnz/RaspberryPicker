@@ -7,6 +7,7 @@ class InterfaceReceiver {
         InterfaceReceiver();
         void listen();
         String get_state_json();
+        void request_state_change(String key, String value);
     private:
         JsonDocument state;
 };
