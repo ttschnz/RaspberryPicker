@@ -8,7 +8,7 @@
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncUDP.h>
 
-#include "InterfaceReceiver.h"
+#include "InterfaceSlave.h"
 
 class InterfaceConfigValues
 {
@@ -22,13 +22,13 @@ class InterfaceConfigValues
 class InterfaceServer
 {
     public:
-        InterfaceServer(InterfaceReceiver *interface_receiver);
+        InterfaceServer(InterfaceSlave *interface_slave);
 
     private:
         AsyncWebServer *server;
         AsyncDNSServer *dns_server;
         IPAddress my_ip;
-        InterfaceReceiver *interface_receiver;
+        InterfaceSlave *interface_slave;
         void handle_root(AsyncWebServerRequest *request);
         void handle_state_get(AsyncWebServerRequest *request);
         void handle_state_post(AsyncWebServerRequest *request);

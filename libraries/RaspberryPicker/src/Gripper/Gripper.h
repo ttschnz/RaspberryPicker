@@ -3,11 +3,12 @@
 
 #include <Stepper.h>
 
-#include "Gripper/ColorSensor.h"
-#include "Gripper/PressureSensor.h"
-#include "Gripper/GrabberStepper.h"
-#include "Basket.h"
-#include "InterfaceSender.h"
+#include "../InterfaceMaster.h"
+#include "../Basket/Basket.h"
+
+#include "ColorSensor.h"
+#include "PressureSensor.h"
+#include "GrabberStepper.h"
 
 typedef struct {
     int color_sensor_pin;
@@ -26,7 +27,7 @@ class GripperController{
         /**
         *
         */
-        GripperController(GripperPinout *pinout,InterfaceSender *interface);
+        GripperController(GripperPinout *pinout,InterfaceMaster *interface);
 
         RaspberrySize set_grabber(GrabberState desired_grabber_state);
         bool measure_color();
@@ -38,7 +39,7 @@ class GripperController{
         }
 
         Stepper *plate_stepper;
-        InterfaceSender *interface;
+        InterfaceMaster *interface;
         PressureSensor *pressure_sensor;
 
 };

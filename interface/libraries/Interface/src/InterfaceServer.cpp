@@ -9,7 +9,7 @@
 
 #include "static/index_html.h"
 
-#include "InterfaceReceiver.h"
+#include "InterfaceSlave.h"
 
 const char* InterfaceConfigValues::wifi_ssid = "RaspberryPicker12";
 const char* InterfaceConfigValues::wifi_password = "00000000";
@@ -17,8 +17,8 @@ const char* InterfaceConfigValues::server_hostname = "raspberrypicker";
 const int InterfaceConfigValues::dns_port = 53;
 
 
-InterfaceServer::InterfaceServer(InterfaceReceiver *interface_receiver){
-    this->interface_receiver = interface_receiver;
+InterfaceServer::InterfaceServer(InterfaceSlave *interface_slave){
+    this->interface_slave = interface_slave;
 
     WiFi.hostname("esp8266device");
     WiFi.softAP(
@@ -62,7 +62,7 @@ void InterfaceServer::handle_root(AsyncWebServerRequest *request){
 }
 
 void InterfaceServer::handle_state_get(AsyncWebServerRequest *request){
-    String current_state = this->interface_receiver->get_state_json();
+    String current_state = this->interface_slave->get_state_json();
     request->send(
         200,
         "application/json",

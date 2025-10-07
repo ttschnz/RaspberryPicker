@@ -1,9 +1,10 @@
-#ifndef RASPBERRY_PICKER_INTERFACE_SENDER_H
-#define RASPBERRY_PICKER_INTERFACE_SENDER_H
+#ifndef RASPBERRY_PICKER_INTERFACE_MASTER_H
+#define RASPBERRY_PICKER_INTERFACE_MASTER_H
 
-#include "Controller.h"
 #include <SoftwareSerial.h>
 #include <Arduino.h>
+
+#include "Controller.h"
 
 typedef struct {
     int rx_pin;
@@ -14,9 +15,9 @@ typedef struct {
 class BasketController;
 class GripperController;
 
-class InterfaceSender {
+class InterfaceMaster {
     public:
-        InterfaceSender(InterfaceConfiguration* config);
+        InterfaceMaster(InterfaceConfiguration* config);
         template <typename T>
             void send_state(const char* key, T value) {
                 String str_value = String(value); // Convert value to String internally

@@ -1,13 +1,13 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 
-#include "InterfaceReceiver.h"
+#include "InterfaceSlave.h"
 
-InterfaceReceiver::InterfaceReceiver(){
+InterfaceSlave::InterfaceSlave(){
     Serial.begin(9600);
 };
 
-void InterfaceReceiver::listen(){
+void InterfaceSlave::listen(){
     if (Serial.available() > 0) {
         String line = Serial.readStringUntil('\n');  // Read a line ending with newline
         line.trim(); // Remove any trailing whitespace or \r
@@ -22,7 +22,7 @@ void InterfaceReceiver::listen(){
       }
 }
 
-void InterfaceReceiver::request_state_change(String key, String value){
+void InterfaceSlave::request_state_change(String key, String value){
     String data_buffer;
     data_buffer.concat(key);
     data_buffer.concat("=");
@@ -31,7 +31,7 @@ void InterfaceReceiver::request_state_change(String key, String value){
     Serial.println(data_buffer);
 }
 
-String InterfaceReceiver::get_state_json(){
+String InterfaceSlave::get_state_json(){
     String state;
     serializeJsonPretty(this->state, state);
     return state;

@@ -1,14 +1,15 @@
 #include <Stepper.h>
 #include <Arduino.h>
 
-#include "Math/gaussian_pdf.h"
-#include "Gripper/ColorSensor.h"
-#include "Gripper/GrabberStepper.h"
-#include "Gripper/PressureSensor.h"
-#include "InterfaceSender.h"
+#include "../Math/gaussian_pdf.h"
+#include "../InterfaceMaster.h"
+#include "../Basket/Basket.h"
 
-#include "Basket.h"
 #include "Gripper.h"
+#include "ColorSensor.h"
+#include "GrabberStepper.h"
+#include "PressureSensor.h"
+
 
 
 const float ColorSensorValues::threshold = 0.5;
@@ -24,7 +25,7 @@ const float PressureSensor::berry_size_large_standard_deviation = 0;
 const float PressureSensor::berry_size_large_mean = 0;
 const int PressureSensor::pressure_sensor_thresholds[2] = {1023,1023};
 
-GripperController::GripperController(GripperPinout *pinout, InterfaceSender *interface){
+GripperController::GripperController(GripperPinout *pinout, InterfaceMaster *interface){
     this->interface = interface;
     pinMode(pinout->color_sensor_pin, INPUT);
     pinMode(pinout->resistance_sensor_pin, INPUT);

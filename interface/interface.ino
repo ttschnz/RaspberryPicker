@@ -1,15 +1,15 @@
 #include "InterfaceServer.h"
-#include "InterfaceReceiver.h"
+#include "InterfaceSlave.h"
 
 InterfaceServer* interface_server;
-InterfaceReceiver* interface_receiver;
+InterfaceSlave* interface_slave;
 
 void setup() {
     delay(1000);
-    interface_receiver = new InterfaceReceiver();
-    interface_server = new InterfaceServer(interface_receiver);
+    interface_slave = new InterfaceSlave();
+    interface_server = new InterfaceServer(interface_slave);
 }
 
 void loop() {
-    interface_receiver->listen();
+    interface_slave->listen();
 }

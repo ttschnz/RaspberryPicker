@@ -1,10 +1,10 @@
-#ifndef RASPBERRY_INTERFACE_RECEIVER_H
-#define RASPBERRY_INTERFACE_RECEIVER_H
+#ifndef RASPBERRY_INTERFACE_SLAVE_H
+#define RASPBERRY_INTERFACE_SLAVE_H
 #include <ArduinoJson.h>
 
-class InterfaceReceiver {
+class InterfaceSlave {
     public:
-        InterfaceReceiver();
+        InterfaceSlave();
         void listen();
         String get_state_json();
         void request_state_change(String key, String value);

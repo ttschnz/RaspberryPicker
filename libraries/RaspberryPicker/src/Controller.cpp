@@ -1,8 +1,10 @@
 #include "Controller.h"
-#include "Basket.h"
-#include "Gripper.h"
+
+#include "Basket/Basket.h"
 #include "Basket/Door.h"
 #include "Basket/Sorting.h"
+
+#include "Gripper/Gripper.h"
 #include "Gripper/GrabberStepper.h"
 
 Controller::Controller(State state){

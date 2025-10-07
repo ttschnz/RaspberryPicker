@@ -1,13 +1,15 @@
-#include "InterfaceSender.h"
-#include "Basket.h"
+
+#include "Basket/Basket.h"
 #include "Basket/Door.h"
 #include "Basket/Sorting.h"
-#include "Gripper.h"
+
+#include "Gripper/Gripper.h"
+#include "InterfaceMaster.h"
 
 #include <SoftwareSerial.h>
 #include <Arduino.h>
 
-InterfaceSender::InterfaceSender(InterfaceConfiguration* config){
+InterfaceMaster::InterfaceMaster(InterfaceConfiguration* config){
     pinMode(config->rx_pin, INPUT);
     pinMode(config->tx_pin, OUTPUT);
 
@@ -15,7 +17,7 @@ InterfaceSender::InterfaceSender(InterfaceConfiguration* config){
     this->Serial->begin(config->baud_rate);
 };
 
-void InterfaceSender::listen_state_change_requests(){
+void InterfaceMaster::listen_state_change_requests(){
     while (this->Serial->available() > 0) {
         String line = this->Serial->readStringUntil('\n');  // Read a line ending with newline
         line.trim(); // Remove any trailing whitespace or \r
@@ -42,7 +44,7 @@ void InterfaceSender::listen_state_change_requests(){
     }
 }
 
-void InterfaceSender::add_controllers(BasketController* basket_controller, GripperController* gripper_controller){
+void InterfaceMaster::add_controllers(BasketController* basket_controller, GripperController* gripper_controller){
     this->basket_controller = basket_controller;
     this->gripper_controller = gripper_controller;
 }

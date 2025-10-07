@@ -1,8 +1,11 @@
 #include <Arduino.h>
 #include <Servo.h>
+
+#include "../InterfaceMaster.h"
+
 #include "Basket.h"
-#include "Basket/Door.h"
-#include "Basket/Sorting.h"
+#include "Door.h"
+#include "Sorting.h"
 
 const int SortingServoValues::small_pos = 0;
 const int SortingServoValues::idle_pos = 90;
@@ -15,7 +18,7 @@ const int DoorValues::open_large_pos = 180;
 const int DoorValues::speed = 300;
 const int DoorValues::max_fill = 23;
 
-BasketController::BasketController(BasketPinout *pinout,InterfaceSender *interface){
+BasketController::BasketController(BasketPinout *pinout,InterfaceMaster *interface){
     this->interface = interface;
 
     // Initialize fill count values to zero
