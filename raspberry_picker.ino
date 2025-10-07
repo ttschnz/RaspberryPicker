@@ -39,6 +39,7 @@ void setup() {
 
   interface_master->add_controllers(basket_controller, gripper_controller);
   controller->add_controllers(basket_controller, gripper_controller);
+  controller->add_interface(interface_master);
 }
 
 void loop() {
@@ -61,6 +62,8 @@ void loop() {
                 case Controller::Program::RESET:
                     controller->run_reset();
                     break;
+
+                controller->set_state(Controller::State::IDLE);
             }
             break;
     }

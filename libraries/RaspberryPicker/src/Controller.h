@@ -6,7 +6,7 @@
 
 class BasketController;
 class GripperController;
-
+class InterfaceMaster;
 
 class Controller{
     public:
@@ -15,18 +15,39 @@ class Controller{
             IDLE,
             PROGRAM,
         };
+        const char* state_strings[3] = {
+            "MANUAL",
+            "IDLE",
+            "PROGRAM",
+        };
         enum Program{
             CLOSE,
             RELEASE,
             DROP,
             RESET,
         };
+        const char* program_strings[4] = {
+            "CLOSE",
+            "RELEASE",
+            "DROP",
+            "RESET",
+        };
+        const char* serialize_program(Program program);
+        bool deserialize_program(String program, Program* out_program);
+        const char* serialize_state(State state);
+        bool deserialize_state(String state, State* out_state);
+
         Controller(State state);
         Controller(Program program);
+
         State get_state();
         Program get_program();
-        void add_controllers(BasketController* basket_controller, GripperController* gripper_controller);
 
+        void set_state(State state);
+        void set_program(Program program);
+
+        void add_controllers(BasketController* basket_controller, GripperController* gripper_controller);
+        void add_interface(InterfaceMaster* interface);
         /**
          * Program CLOSE:
          * Used to close the grabbing mechanism
@@ -70,6 +91,7 @@ class Controller{
 
         GripperController* gripper_controller;
         BasketController* basket_controller;
+        InterfaceMaster* interface;
 };
 
 #endif
