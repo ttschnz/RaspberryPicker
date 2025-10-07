@@ -1,9 +1,12 @@
 #ifndef RASPBERRY_PICKER_CONTROLLER_H
 #define RASPBERRY_PICKER_CONTROLLER_H
 
-#include "Basket.h"
-#include "Gripper.h"
 #include <Arduino.h>
+
+
+class BasketController;
+class GripperController;
+
 
 class Controller{
     public:
@@ -20,7 +23,9 @@ class Controller{
         };
         Controller(State state);
         Controller(Program program);
+        State get_state();
         Program get_program();
+        void add_controllers(BasketController* basket_controller, GripperController* gripper_controller);
 
         /**
          * Program CLOSE:
@@ -58,6 +63,7 @@ class Controller{
          * - closes the doors of the basket (CLOSED)
          */
         void run_reset();
+
     private:
         State state;
         Program program;

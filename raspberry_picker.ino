@@ -3,7 +3,7 @@
 #include <Basket.h>
 #include <Gripper.h>
 #include <InterfaceSender.h>
-#include <Controller.h">
+#include <Controller.h>
 
 BasketPinout basket_pinout {
   .sorting_pin = 9,
@@ -12,8 +12,8 @@ BasketPinout basket_pinout {
 
 GripperPinout gripper_pinout {
     .color_sensor_pin = 11,
-    .pressure_sensor_pin = 12,
-    .resistance_sensor_pin = 13,
+    .pressure_sensor_pins = {12,13},
+    .resistance_sensor_pin = 18,
     .stepper_motor_pins = {14,15,16,17},
 };
 
@@ -26,18 +26,22 @@ InterfaceConfiguration interface_configuration {
 BasketController* basket_controller;
 GripperController* gripper_controller;
 InterfaceSender* interface_sender;
+Controller* controller;
 
 void setup() {
+  controller = new Controller(Controller::State::IDLE);
+
   interface_sender = new InterfaceSender(&interface_configuration);
 
   basket_controller = new BasketController(&basket_pinout, interface_sender);
   gripper_controller = new GripperController(&gripper_pinout, interface_sender);
 
   interface_sender->add_controllers(basket_controller, gripper_controller);
+  controller->add_controllers(basket_controller, gripper_controller);
 }
 
 void loop() {
-    switch (interface_sender->control_state){
+    switch (controller->get_state()){
         case Controller::State::IDLE:
             interface_sender->listen_state_change_requests();
             break;
@@ -46,15 +50,15 @@ void loop() {
             break;
         case Controller::State::PROGRAM:
             interface_sender->listen_state_change_requests();
-            switch (interface_sender->control_state->get_program()){
+            switch (controller->get_program()){
                 case Controller::Program::CLOSE:
-                    Controller::run_close();
+                    controller->run_close();
                     break;
                 case Controller::Program::DROP:
-                    Controller::run_drop();
+                    controller->run_drop();
                     break;
                 case Controller::Program::RESET:
-                    Controller::run_reset();
+                    controller->run_reset();
                     break;
             }
             break;

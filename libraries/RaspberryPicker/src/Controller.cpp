@@ -1,8 +1,9 @@
 #include "Controller.h"
 #include "Basket.h"
+#include "Gripper.h"
 #include "Basket/Door.h"
 #include "Basket/Sorting.h"
-#include "Gripper/PlateStepper.h"
+#include "Gripper/GrabberStepper.h"
 
 Controller::Controller(State state){
     if (state == State::PROGRAM){
@@ -20,6 +21,14 @@ Controller::Program Controller::get_program(){
     return this->program;
 }
 
+Controller::State Controller::get_state(){
+    return this->state;
+}
+
+void Controller::add_controllers(BasketController* basket_controller, GripperController* gripper_controller){
+    this->basket_controller = basket_controller;
+    this->gripper_controller = gripper_controller;
+}
 
 void Controller::run_close(){
     // color sensor

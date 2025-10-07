@@ -1,0 +1,12 @@
+#ifndef RASPBERRY_PICKER_GAUSSIAN_PDF_H
+#define RASPBERRY_PICKER_GAUSSIAN_PDF_H
+#ifndef EULERS_NUMBER
+#define EULERS_NUMBER 2.718281828459045235360287471352
+#endif
+#ifndef PI
+#define PI 3.141592653589793
+#endif
+
+float gaussian_pdf_lookup(float z);
+
+#endif

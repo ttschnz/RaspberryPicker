@@ -13,6 +13,7 @@ const int DoorValues::open_small_pos = 0;
 const int DoorValues::closed_pos = 90;
 const int DoorValues::open_large_pos = 180;
 const int DoorValues::speed = 300;
+const int DoorValues::max_fill = 23;
 
 BasketController::BasketController(BasketPinout *pinout,InterfaceSender *interface){
     this->interface = interface;
