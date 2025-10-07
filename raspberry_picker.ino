@@ -3,6 +3,7 @@
 #include <Basket.h>
 #include <Gripper.h>
 #include <InterfaceSender.h>
+#include <Controller.h">
 
 BasketPinout basket_pinout {
   .sorting_pin = 9,
@@ -36,40 +37,26 @@ void setup() {
 }
 
 void loop() {
-    interface_sender->listen_state_change_requests();
-    basket_controller->set_door(DoorState::CLOSED);
-    basket_controller->set_sorting(SortingState::IDLE);
-    delay(1000);
-    basket_controller->set_sorting(SortingState::LARGE);
-    delay(1000);
-    basket_controller->set_sorting(SortingState::IDLE);
-    delay(1000);
-    basket_controller->set_sorting(SortingState::SMALL);
-    delay(1000);
-    basket_controller->increment_counter();
-    delay(100);
-    basket_controller->increment_counter();
-    delay(100);
-    basket_controller->increment_counter();
-    delay(100);
-    basket_controller->increment_counter();
-    delay(100);
-    basket_controller->increment_counter();
-    delay(100);
-    basket_controller->increment_counter();
-    delay(100);
-    basket_controller->increment_counter();
-    delay(1000);
-    basket_controller->set_door(DoorState::OPEN_LARGE);
-    basket_controller->reset_counter();
-    delay(1000);
-    basket_controller->set_door(DoorState::CLOSED);
-    basket_controller->reset_counter();
-    delay(1000);
-    basket_controller->set_door(DoorState::OPEN_SMALL);
-    basket_controller->reset_counter();
-    delay(1000);
-    basket_controller->set_door(DoorState::CLOSED);
-    basket_controller->reset_counter();
-    delay(1000);
+    switch (interface_sender->control_state){
+        case Controller::State::IDLE:
+            interface_sender->listen_state_change_requests();
+            break;
+        case Controller::State::MANUAL:
+            interface_sender->listen_state_change_requests();
+            break;
+        case Controller::State::PROGRAM:
+            interface_sender->listen_state_change_requests();
+            switch (interface_sender->control_state->get_program()){
+                case Controller::Program::CLOSE:
+                    Controller::run_close();
+                    break;
+                case Controller::Program::DROP:
+                    Controller::run_drop();
+                    break;
+                case Controller::Program::RESET:
+                    Controller::run_reset();
+                    break;
+            }
+            break;
+    }
 }

@@ -22,13 +22,14 @@ static const char* door_state_strings[] = {
 const char* door_state_to_str(DoorState door_state);
 bool str_to_door_state(String door_state_str, DoorState* out_door_state);
 
-class DoorServoValues
+class DoorValues
 {
     public:
         static const int closed_pos;        // position at which the both containers are closed  [deg]
         static const int open_large_pos;    // position at which the large berry container is open [deg]
         static const int open_small_pos;    // position at which the small berry container is open [deg]
         static const int speed;             // measured angular speed to predict position [deg/s]
+        static const int max_fill;          // how many raspberries can we fit?
 };
 
 #endif

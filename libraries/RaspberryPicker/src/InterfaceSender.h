@@ -1,6 +1,7 @@
 #ifndef RASPBERRY_PICKER_INTERFACE_SENDER_H
 #define RASPBERRY_PICKER_INTERFACE_SENDER_H
 
+#include "Controller.h"
 #include <SoftwareSerial.h>
 #include <Arduino.h>
 
@@ -23,12 +24,13 @@ class InterfaceSender {
                 data_buffer.concat(key);
                 data_buffer.concat("=");
                 data_buffer.concat(str_value);
-
                 this->Serial->println(data_buffer);
+                this->controller = new Controller(Controller::State::IDLE);
             };
 
         void listen_state_change_requests();
         void add_controllers(BasketController* basket_controller,GripperController* gripper_controller);
+        Controller* controller;
     private:
         SoftwareSerial* Serial;
         BasketController* basket_controller;

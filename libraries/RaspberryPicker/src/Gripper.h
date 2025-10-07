@@ -6,7 +6,7 @@
 #include "Gripper/ColorSensor.h"
 #include "Gripper/PressureSensor.h"
 #include "Gripper/ResistanceSensor.h"
-#include "Gripper/PlateStepper.h"
+#include "Gripper/GrabberStepper.h"
 #include "InterfaceSender.h"
 
 typedef struct {
@@ -16,12 +16,20 @@ typedef struct {
     int stepper_motor_pins[4];
 } GripperPinout;
 
+enum RaspberrySize{
+    LARGE,
+    SMALL
+};
+
 class GripperController{
     public:
         /**
         *
         */
         GripperController(GripperPinout *pinout,InterfaceSender *interface);
+
+        RaspberrySize set_grabber(GrabberState desired_grabber_state);
+        bool measure_color();
     private:
 
         ~GripperController() {

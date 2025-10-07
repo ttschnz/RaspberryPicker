@@ -63,8 +63,8 @@ class BasketController {
          */
         bool increment_counter();
 
-    private:
         FillCount fill_count;
+    private:
         Servo sorting_servo;
         Servo door_servo;
         int sorting_pos;
