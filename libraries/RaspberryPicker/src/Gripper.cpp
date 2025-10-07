@@ -82,8 +82,8 @@ RaspberrySize GripperController::set_grabber(GrabberState desired_grabber_state)
             raspberry_width-PressureSensor::berry_size_small_mean
         ) / PressureSensor::berry_size_small_standard_deviation;
 
-    float p_w_given_L = gaussian_pdf_lookup(z_large);
-    float p_w_given_S = gaussian_pdf_lookup(z_small);
+    float p_w_given_L = gaussian_pdf(z_large);
+    float p_w_given_S = gaussian_pdf(z_small);
 
     float p_L = 0.5, p_S = 0.5;
 

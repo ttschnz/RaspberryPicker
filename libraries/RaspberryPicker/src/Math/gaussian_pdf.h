@@ -7,6 +7,6 @@
 #define PI 3.141592653589793
 #endif
 
-float gaussian_pdf_lookup(float z);
+float gaussian_pdf(float z);
 
 #endif
