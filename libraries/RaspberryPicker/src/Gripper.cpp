@@ -3,7 +3,6 @@
 
 #include "Gripper/ColorSensor.h"
 //#include "Gripper/PressureSensor.h"
-#include "Gripper/ResistanceSensor.h"
 #include "Gripper/PlateStepper.h"
 
 #include "Gripper.h"
@@ -11,7 +10,8 @@
 
 const float ColorSensorValues::threshold = 0.5;
 
-const float ResistanceSensorValues::threshold = 0.5;
+
+
 
 const float PlateStepperMotorValues::transmission_ratio = 0.5;
 const int PlateStepperMotorValues::measuring_interval = 1;
