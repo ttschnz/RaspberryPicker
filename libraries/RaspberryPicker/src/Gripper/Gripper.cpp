@@ -43,6 +43,23 @@ GripperController::GripperController(GripperPinout *pinout, InterfaceMaster *int
     this->plate_stepper->setSpeed(GrabberStepperMotorValues::speed);
 }
 
+const char* raspberry_size_to_str(RaspberrySize raspberry_size){
+    int idx = (int)raspberry_size;
+    return raspberry_size_strings[idx];
+}
+
+bool str_to_raspberry_size(String raspberry_size_str, RaspberrySize* out_raspberry_size){
+    bool matched = true;
+    if (raspberry_size_str=="LARGE"){
+        *out_raspberry_size = RaspberrySize::LARGE;
+    }else if (raspberry_size_str=="SMALL"){
+        *out_raspberry_size = RaspberrySize::SMALL;
+    }else{
+        matched = false;
+    }
+    return matched;
+}
+
 
 RaspberrySize GripperController::set_grabber(GrabberState desired_grabber_state){
     // close until the plates get touch feedback
@@ -91,8 +108,8 @@ RaspberrySize GripperController::set_grabber(GrabberState desired_grabber_state)
     float probability_large = p_w_given_L * p_L / (p_w_given_L * p_L + p_w_given_S * p_S);
     float probability_small = p_w_given_S * p_L / (p_w_given_L * p_L + p_w_given_S * p_S);
 
-    this->interface->send_state("berry_p_large", probability_large);
-    this->interface->send_state("berry_p_small", probability_small);
+    this->interface->send_state("gripper.berry_p_large", probability_large);
+    this->interface->send_state("gripper.berry_p_small", probability_small);
 
     if (probability_large>probability_small){
         return RaspberrySize::LARGE;

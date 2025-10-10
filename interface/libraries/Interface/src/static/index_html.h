@@ -3,7 +3,7 @@ const char index_html[] PROGMEM = R"rawliteral(
     <html lang="en">
     <head>
       <meta charset="UTF-8">
-      <title>System Status Dashboard</title>
+      <title>Raspberry Picker Interface</title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <style>
         body {
@@ -20,7 +20,7 @@ const char index_html[] PROGMEM = R"rawliteral(
         }
 
         table {
-          width: 60%;
+          width: 70%;
           margin: 0 auto;
           border-collapse: collapse;
           background-color: #fff;
@@ -31,16 +31,16 @@ const char index_html[] PROGMEM = R"rawliteral(
 
         @media only screen and (max-width: 800px) {
           table {
-            width: 90vw;
+            width: 95vw;
           }
         }
 
         colgroup col:first-child {
-          width: 25%; /* 1 part */
+          width: 30%;
         }
 
         colgroup col:last-child {
-          width: 75%; /* 3 parts */
+          width: 70%;
         }
 
         th, td {
@@ -65,6 +65,30 @@ const char index_html[] PROGMEM = R"rawliteral(
           font-weight: bold;
           color: #2c3e50;
         }
+
+        select, input[type="number"] {
+          padding: 5px;
+          font-size: 0.9rem;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        button {
+          display: block;
+          margin: 20px auto;
+          padding: 10px 20px;
+          background-color: #2c3e50;
+          color: #fff;
+          border: none;
+          border-radius: 5px;
+          font-size: 1rem;
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+        }
+
+        button:hover {
+          background-color: #1a252f;
+        }
       </style>
     </head>
     <body>
@@ -83,52 +107,158 @@ const char index_html[] PROGMEM = R"rawliteral(
           </tr>
         </thead>
         <tbody>
+          <!-- Editable parameters -->
           <tr>
-            <td>Door State</td>
-            <td id="door-state" class="value"></td>
+            <td>Controller Program</td>
+            <td>
+              <select id="controller-program">
+                <option value="CLOSE">CLOSE</option>
+                <option value="RELEASE">RELEASE</option>
+                <option value="DROP">DROP</option>
+                <option value="RESET">RESET</option>
+              </select>
+            </td>
           </tr>
           <tr>
-            <td>Door Position</td>
-            <td id="door-position" class="value"></td>
+            <td>Controller State</td>
+            <td>
+              <select id="controller-state">
+                <option value="MANUAL">MANUAL</option>
+                <option value="IDLE">IDLE</option>
+                <option value="PROGRAM">PROGRAM</option>
+              </select>
+            </td>
           </tr>
           <tr>
-            <td>Sorting State</td>
-            <td id="sorting-state" class="value"></td>
+            <td>Basket Door State</td>
+            <td>
+              <select id="basket-door-state">
+                <option value="OPEN_SMALL">OPEN_SMALL</option>
+                <option value="OPEN_LARGE">OPEN_LARGE</option>
+                <option value="CLOSED">CLOSED</option>
+              </select>
+            </td>
           </tr>
           <tr>
-            <td>Sorting Position</td>
-            <td id="sorting-position" class="value"></td>
+            <td>Basket Door Position</td>
+            <td><input type="number" id="basket-door-position" step="1"></td>
+          </tr>
+          <tr>
+            <td>Basket Sorting State</td>
+            <td>
+              <select id="basket-sorting-state">
+                <option value="LARGE">LARGE</option>
+                <option value="SMALL">SMALL</option>
+                <option value="IDLE">IDLE</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>Basket Sorting Position</td>
+            <td><input type="number" id="basket-sorting-position" step="1"></td>
+          </tr>
+
+          <!-- Read-only values -->
+          <tr>
+            <td>Gripper Berry p (Large)</td>
+            <td id="gripper-berry-p-large" class="value"></td>
+          </tr>
+          <tr>
+            <td>Gripper Berry p (Small)</td>
+            <td id="gripper-berry-p-small" class="value"></td>
+          </tr>
+          <tr>
+            <td>Raspberry Size</td>
+            <td id="gripper-raspberry-size" class="value"></td>
           </tr>
           <tr>
             <td>Fill Count (Small)</td>
-            <td id="fill-count-small" class="value"></td>
+            <td id="basket-fill-count-small" class="value"></td>
           </tr>
           <tr>
             <td>Fill Count (Large)</td>
-            <td id="fill-count-large" class="value"></td>
+            <td id="basket-fill-count-large" class="value"></td>
           </tr>
         </tbody>
       </table>
 
+      <button id="update-button">Update Robot State</button>
+
       <script>
-        setInterval(async () => {
+        let isEditing = false;
+        const editableIds = [
+          "controller-program",
+          "controller-state",
+          "basket-door-state",
+          "basket-door-position",
+          "basket-sorting-state",
+          "basket-sorting-position"
+        ];
+
+        // Mark editing when user changes fields
+        editableIds.forEach(id => {
+          document.getElementById(id).addEventListener('input', () => {
+            isEditing = true;
+          });
+        });
+
+        async function fetchState() {
           try {
             const response = await fetch("/api/state");
             const data = await response.json();
 
-            document.getElementById('door-state').textContent = data["door.state"];
-            document.getElementById('door-position').textContent = data["door.position"];
-            document.getElementById('sorting-state').textContent = data["sorting.state"];
-            document.getElementById('sorting-position').textContent = data["sorting.position"];
-            document.getElementById('fill-count-small').textContent = data["fill_count.small"];
-            document.getElementById('fill-count-large').textContent = data["fill_count.large"];
+            // Only update fields if not currently being edited
+            if (!isEditing) {
+              document.getElementById('controller-program').value = data["controller.program"];
+              document.getElementById('controller-state').value = data["controller.state"];
+              document.getElementById('basket-door-state').value = data["basket.door.state"];
+              document.getElementById('basket-door-position').value = data["basket.door.position"];
+              document.getElementById('basket-sorting-state').value = data["basket.sorting.state"];
+              document.getElementById('basket-sorting-position').value = data["basket.sorting.position"];
+            }
+
+            // Always update read-only values
+            document.getElementById('gripper-berry-p-large').textContent = data["gripper.berry_p_large"];
+            document.getElementById('gripper-berry-p-small').textContent = data["gripper.berry_p_small"];
+            document.getElementById('gripper-raspberry-size').textContent = data["gripper.raspberry_size"];
+            document.getElementById('basket-fill-count-small').textContent = data["basket.fill_count.small"];
+            document.getElementById('basket-fill-count-large').textContent = data["basket.fill_count.large"];
           } catch (error) {
             console.error("Error fetching state:", error);
           }
-        }, 100);
+        }
+
+        setInterval(fetchState, 100);
+
+        document.getElementById('update-button').addEventListener('click', async () => {
+          const payload = {
+            "controller.program": document.getElementById('controller-program').value,
+            "controller.state": document.getElementById('controller-state').value,
+            "basket.door.state": document.getElementById('basket-door-state').value,
+            "basket.door.position": document.getElementById('basket-door-position').value,
+            "basket.sorting.state": document.getElementById('basket-sorting-state').value,
+            "basket.sorting.position": document.getElementById('basket-sorting-position').value
+          };
+
+          try {
+            const response = await fetch("/api/state", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+              throw new Error("Failed to update state");
+            }
+            isEditing = false;
+          } catch (error) {
+            console.error("Error updating state:", error);
+          }
+        });
       </script>
 
     </body>
     </html>
+
 
 )rawliteral";

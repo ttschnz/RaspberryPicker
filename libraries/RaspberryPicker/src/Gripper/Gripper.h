@@ -22,6 +22,14 @@ enum RaspberrySize{
     SMALL
 };
 
+static const char* raspberry_size_strings[] = {
+    "LARGE",
+    "SMALL"
+};
+
+const char* raspberry_size_to_str(RaspberrySize raspberry_size);
+bool str_to_raspberry_size(String raspberry_size_str, RaspberrySize* out_raspberry_size);
+
 class GripperController{
     public:
         /**

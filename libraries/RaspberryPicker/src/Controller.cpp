@@ -56,6 +56,8 @@ void Controller::run_close(){
 
     // close grabbing mechanism
     RaspberrySize size = this->gripper_controller->set_grabber(GrabberState::CLOSED);
+    this->interface->send_state("gripper.raspberry_size", raspberry_size_to_str(size));
+
 
     // set sorting to the correct position
     switch(size){
