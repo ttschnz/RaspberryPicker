@@ -6,16 +6,17 @@
 #include <Basket/Basket.h>
 #include <Gripper/Gripper.h>
 
+#include <Gripper/ColorSensor.h>
+
 BasketPinout basket_pinout {
-  .sorting_pin = 9,
-  .door_pin = 10,
+  .sorting_pin = 13,
+  .door_pin = 12,
 };
 
 GripperPinout gripper_pinout {
-    .color_sensor_pin = 11,
-    .pressure_sensor_pins = {12,13},
-    .resistance_sensor_pin = 18,
-    .stepper_motor_pins = {14,15,16,17},
+    .color_sensor_pinout = ColorSensor::Pinout{7,6,5,A5},
+    .pressure_sensor_pins = {A3,A4},
+    .stepper_motor_pins = {8,9,10,11},
 };
 
 InterfaceConfiguration interface_configuration {
@@ -30,7 +31,7 @@ InterfaceMaster* interface_master;
 Controller* controller;
 
 void setup() {
- 
+
     Serial.begin(9600);
     while(!Serial){};
 

@@ -11,9 +11,8 @@
 #include "GrabberStepper.h"
 
 typedef struct {
-    int color_sensor_pin;
+    ColorSensor::Pinout color_sensor_pinout;
     int pressure_sensor_pins[2];
-    int resistance_sensor_pin;
     int stepper_motor_pins[4];
 } GripperPinout;
 
@@ -38,7 +37,7 @@ class GripperController{
         GripperController(GripperPinout *pinout,InterfaceMaster *interface);
 
         RaspberrySize set_grabber(GrabberState desired_grabber_state);
-        bool measure_color();
+        bool is_ripe();
         bool is_touching();
     private:
 
@@ -49,7 +48,7 @@ class GripperController{
         Stepper *plate_stepper;
         InterfaceMaster *interface;
         PressureSensor *pressure_sensor;
-
+        ColorSensor *color_sensor;
 };
 
 #endif

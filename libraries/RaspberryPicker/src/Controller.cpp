@@ -55,7 +55,8 @@ void Controller::add_interface(InterfaceMaster* interface){
 
 void Controller::run_close(){
     // color sensor
-    bool is_ripe = this->gripper_controller->measure_color();
+    bool is_ripe = this->gripper_controller->is_ripe();
+    this->interface->send_state("gripper.raspberry_ripeness", is_ripe);
 
     if (!is_ripe){
         return;

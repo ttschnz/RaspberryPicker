@@ -12,7 +12,10 @@
 
 
 
-const float ColorSensorValues::threshold = 0.5;
+const int ColorSensor::measure_count = 100;
+const int ColorSensor::delay_probe = 10;
+const int ColorSensor::delay_color = 100;
+const int ColorSensor::delay_calibrate = 2000;
 
 const float GrabberStepperMotorValues::transmission_ratio = 1.5 * 18 * PI;
 const int GrabberStepperMotorValues::measuring_interval = 1;
@@ -27,9 +30,8 @@ const int PressureSensor::pressure_sensor_thresholds[2] = {1023,1023};
 
 GripperController::GripperController(GripperPinout *pinout, InterfaceMaster *interface){
     this->interface = interface;
-    pinMode(pinout->color_sensor_pin, INPUT);
-    pinMode(pinout->resistance_sensor_pin, INPUT);
 
+    this->color_sensor = new ColorSensor(pinout->color_sensor_pinout);
     this->pressure_sensor = new PressureSensor(pinout->pressure_sensor_pins);
 
     this->plate_stepper = new Stepper(
@@ -118,6 +120,15 @@ RaspberrySize GripperController::set_grabber(GrabberState desired_grabber_state)
     }
 }
 
-bool GripperController::measure_color(){
-    return true; // allways ripe
+bool GripperController::is_ripe(){
+    RGB color = this->color_sensor->measure_rgb();
+
+    this->interface->send_state("gripper.ripeness.r", color.r);
+    this->interface->send_state("gripper.ripeness.g", color.g);
+    this->interface->send_state("gripper.ripeness.b", color.b);
+
+    // TODO: linear regression?
+    // for now: if the red value is higher than both other values combined (*tolerance)
+    // the raspberry is considered ripe.
+    return color.r > (color.b + color.g) * 0.8;
 }
