@@ -11,6 +11,9 @@
 #include <Arduino.h>
 
 InterfaceMaster::InterfaceMaster(InterfaceConfiguration* config){
+    this->basket_controller = nullptr;
+    this->gripper_controller = nullptr;
+
     pinMode(config->rx_pin, INPUT);
     pinMode(config->tx_pin, OUTPUT);
 

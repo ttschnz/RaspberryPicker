@@ -11,6 +11,9 @@ Controller::Controller(State state){
     if (state == State::PROGRAM){
         state = State::IDLE; // default to idle
     }
+    this->basket_controller = nullptr;
+    this->gripper_controller = nullptr;
+    this->interface = nullptr;
     this->set_state(state);
 }
 
@@ -29,12 +32,16 @@ Controller::State Controller::get_state(){
 void Controller::set_program(Controller::Program program){
     this->set_state(Controller::State::PROGRAM);
     this->program = program;
-    this->interface->send_state("controller.program", Controller::serialize_program(program));
+    if(this->interface != nullptr){
+        this->interface->send_state("controller.program", Controller::serialize_program(program));
+    }
 }
 
 void Controller::set_state(Controller::State state){
     this->state = state;
-    this->interface->send_state("controller.state", Controller::serialize_state(state));
+    if(this->interface != nullptr){
+        this->interface->send_state("controller.state", Controller::serialize_state(state));
+    }
 }
 
 void Controller::add_controllers(BasketController* basket_controller, GripperController* gripper_controller){

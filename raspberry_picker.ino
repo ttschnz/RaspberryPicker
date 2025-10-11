@@ -30,16 +30,30 @@ InterfaceMaster* interface_master;
 Controller* controller;
 
 void setup() {
-  controller = new Controller(Controller::State::IDLE);
+ 
+    Serial.begin(9600);
+    while(!Serial){};
 
-  interface_master = new InterfaceMaster(&interface_configuration);
+    Serial.println("initialising");
 
-  basket_controller = new BasketController(&basket_pinout, interface_master);
-  gripper_controller = new GripperController(&gripper_pinout, interface_master);
+    controller = new Controller(Controller::State::IDLE);
+    Serial.println("controller created");
+    interface_master = new InterfaceMaster(&interface_configuration);
+    Serial.println("webinterface ready");
 
-  interface_master->add_controllers(basket_controller, gripper_controller);
-  controller->add_controllers(basket_controller, gripper_controller);
-  controller->add_interface(interface_master);
+    basket_controller = new BasketController(&basket_pinout, interface_master);
+    Serial.println("basket controller ready");
+    gripper_controller = new GripperController(&gripper_pinout, interface_master);
+    Serial.println("gripper controller ready");
+
+    interface_master->add_controllers(basket_controller, gripper_controller);
+    Serial.println("controller connected to webinterface");
+    controller->add_controllers(basket_controller, gripper_controller);
+    Serial.println("controllers connected to main controller");
+    controller->add_interface(interface_master);
+    Serial.println("interface connected to main controller");
+
+
 }
 
 void loop() {
