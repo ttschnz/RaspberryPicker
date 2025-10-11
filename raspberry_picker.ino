@@ -77,7 +77,9 @@ void loop() {
                 case Controller::Program::RESET:
                     controller->run_reset();
                     break;
-
+                case Controller::Program::CALIBRATE_COLOR:
+                    controller->run_calibrate_color();
+                    break;
                 controller->set_state(Controller::State::IDLE);
             }
             break;

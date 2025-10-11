@@ -25,12 +25,14 @@ class Controller{
             RELEASE,
             DROP,
             RESET,
+            CALIBRATE_COLOR,
         };
-        const char* program_strings[4] = {
+        const char* program_strings[5] = {
             "CLOSE",
             "RELEASE",
             "DROP",
             "RESET",
+            "CALIBRATE_COLOR",
         };
         const char* serialize_program(Program program);
         bool deserialize_program(String program, Program* out_program);
@@ -84,6 +86,8 @@ class Controller{
          * - closes the doors of the basket (CLOSED)
          */
         void run_reset();
+
+        void run_calibrate_color();
 
     private:
         State state;

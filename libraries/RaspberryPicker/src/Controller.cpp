@@ -106,6 +106,11 @@ void Controller::run_reset(){
     this->basket_controller->set_sorting(SortingState::IDLE);
 }
 
+void Controller::run_calibrate_color(){
+    this->gripper_controller->color_sensor->calibrate();
+}
+
+
 const char* Controller::serialize_program(Program program){
     int idx = (int)program;
     return Controller::program_strings[idx];
@@ -120,7 +125,9 @@ bool Controller::deserialize_program(String program, Controller::Program* out_pr
         *out_program = Controller::Program::DROP;
     } else if(program== "RESET"){
         *out_program = Controller::Program::RESET;
-    } else {
+    } else if(program == "CALIBRATE_COLOR"){
+        *out_program = Controller::Program::CALIBRATE_COLOR;
+    } else{
         matched = false;
     }
     return matched;

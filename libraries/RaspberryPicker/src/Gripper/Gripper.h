@@ -39,6 +39,7 @@ class GripperController{
         RaspberrySize set_grabber(GrabberState desired_grabber_state);
         bool is_ripe();
         bool is_touching();
+        ColorSensor *color_sensor;
     private:
 
         ~GripperController() {
@@ -48,7 +49,6 @@ class GripperController{
         Stepper *plate_stepper;
         InterfaceMaster *interface;
         PressureSensor *pressure_sensor;
-        ColorSensor *color_sensor;
 };
 
 #endif
