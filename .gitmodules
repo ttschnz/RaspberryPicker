@@ -4,30 +4,9 @@
 [submodule "libraries/Stepper"]
 	path = libraries/Stepper
 	url = https://github.com/arduino-libraries/Stepper
-[submodule "interface/libraries/ESP8266Wifi"]
-	path = interface/libraries/ESP8266Wifi
-	url = https://github.com/ttschnz/ESP8266Wifi
-[submodule "interface/libraries/ESPAsyncWebServer"]
-	path = interface/libraries/ESPAsyncWebServer
-	url = https://github.com/lacamera/ESPAsyncWebServer
-[submodule "interface/libraries/ESPAsyncTCP"]
-	path = interface/libraries/ESPAsyncTCP
-	url = https://github.com/dvarrel/ESPAsyncTCP
-[submodule "interface/libraries/ESPAsyncDNSServer"]
-	path = interface/libraries/ESPAsyncDNSServer
-	url = https://github.com/devyte/ESPAsyncDNSServer
-[submodule "interface/libraries/ESPAsyncUDP"]
-	path = interface/libraries/ESPAsyncUDP
-	url = https://github.com/me-no-dev/ESPAsyncUDP
-[submodule "interface/libraries/ArduinoSTL"]
-	path = interface/libraries/ArduinoSTL
-	url = https://github.com/mike-matera/ArduinoSTL
 [submodule "libraries/ArduinoSTL"]
 	path = libraries/ArduinoSTL
 	url = https://github.com/mike-matera/ArduinoSTL
-[submodule "interface/libraries/ArduinoJson"]
-	path = interface/libraries/ArduinoJson
-	url = https://github.com/bblanchon/ArduinoJson
 [submodule "libraries/ArduinoJson"]
 	path = libraries/ArduinoJson
 	url = https://github.com/bblanchon/ArduinoJson
