@@ -7,13 +7,9 @@ pkgs.mkShell {
     pkgs.python312Packages.pip
     pkgs.python312Packages.tkinter
     pkgs.python312Packages.numpy
+    pkgs.python312Packages.customtkinter
+    pkgs.python312Packages.pyserial
+    pkgs.python312Packages.matplotlib
   ];
 
-  shellHook = ''
-    if [ ! -d venv ]; then
-      python -m venv venv
-    fi
-    source venv/bin/activate
-    pip install -r requirements.txt
-  '';
 }
