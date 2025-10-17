@@ -6,17 +6,18 @@ from RaspberryPicker.state import State
 class ControlCenter(tk.Tk):
     controller_states = ("MANUAL","IDLE","PROGRAM")
     controller_programs = ("CLOSE","RELEASE","DROP","RESET","CALIBRATE_COLOR")
-
+    sorting_states = ("LARGE","SMALL","IDLE")
+    door_states = ("OPEN_SMALL","OPEN_LARGE","CLOSED")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         paddings = {'padx': 2, 'pady': 2}
-
-        self.state = State()
+        self.state = State(self)
 
         self.title("Control Centre")
         self.config(bg="#E4E2E2")
-        self.geometry("700x370")
+        self.geometry("920x520")
+        self.minsize(700, 500)
 
         self.menu = tk.Menu(self)
         self.config(menu=self.menu)
@@ -40,8 +41,8 @@ class ControlCenter(tk.Tk):
 
         self.main_frame = tk.Frame(self)
         self.main_frame.pack(fill=tk.BOTH, expand=True)
-        self.main_frame.columnconfigure(0, weight=2)
-        self.main_frame.columnconfigure(1, weight=3)
+        self.main_frame.columnconfigure(0, weight=1,minsize=200)
+        self.main_frame.columnconfigure(1, weight=0,minsize=300)
         self.main_frame.rowconfigure(0, weight=1)
 
 
@@ -59,31 +60,116 @@ class ControlCenter(tk.Tk):
 
         self.controller_state_label = tk.Label(self.controller_frame, text="Controller State")
         self.controller_state_label.grid(column=0, row=0, sticky=tk.W, **paddings)
-        self.controller_state_var = tk.StringVar(self, value=self.controller_states[0])
         self.controller_state_options = tk.OptionMenu(
             self.controller_frame,
-            self.controller_state_var,
-            *self.controller_states,
-            command=lambda x: self.state.send("controller.state",x))
+            self.state.values["controller.state"],
+            *self.controller_states
+        )
         self.controller_state_options.grid(column=1, row=0, sticky=tk.W, **paddings)
 
         self.controller_program_label = tk.Label(self.controller_frame, text="Controller Program")
         self.controller_program_label.grid(column=0, row=1, sticky=tk.W, **paddings)
-        self.controller_program_var = tk.StringVar(self, value=self.controller_programs[0])
         self.controller_program_options = tk.OptionMenu(
             self.controller_frame,
-            self.controller_program_var,
-            *self.controller_programs,
-            command=lambda x: self.state.send("controller.program", x))
+            self.state.values["controller.program"],
+            *self.controller_programs
+        )
         self.controller_program_options.grid(column=1, row=1, sticky=tk.W, **paddings)
 
         # gripper
         self.gripper_frame = tk.Frame(self.right_frame, borderwidth=1, relief=tk.RIDGE)
         self.gripper_frame.grid(column=0, row=1, sticky=tk.NSEW)
 
+
+        self.raspberry_size_label = tk.Label(self.gripper_frame, text="Size")
+        self.raspberry_size_label.grid(column=0, row=0, sticky=tk.W, **paddings)
+        self.raspberry_size_value = tk.Entry(self.gripper_frame, textvariable=self.state.values["gripper.raspberry_size"], state=tk.DISABLED, width=10)
+        self.raspberry_size_value.grid(column=1, row=0, sticky=tk.W, **paddings)
+
+        self.raspberry_probability_small_label = tk.Label(self.gripper_frame, text="p_s")
+        self.raspberry_probability_small_label.grid(column=2, row=0, sticky=tk.W, **paddings)
+        self.raspberry_probability_small_value = tk.Entry(self.gripper_frame, textvariable=self.state.values["gripper.berry_p_small"], state=tk.DISABLED, width=5)
+        self.raspberry_probability_small_value.grid(column=3, row=0, sticky=tk.W, **paddings)
+
+        self.raspberry_probability_large_label = tk.Label(self.gripper_frame, text="p_l")
+        self.raspberry_probability_large_label.grid(column=4, row=0, sticky=tk.W, **paddings)
+        self.raspberry_probability_large_value = tk.Entry(self.gripper_frame, textvariable=self.state.values["gripper.berry_p_large"], state=tk.DISABLED, width=5)
+        self.raspberry_probability_large_value.grid(column=5, row=0, sticky=tk.W, **paddings)
+
+
+        self.raspberry_ripeness_label = tk.Label(self.gripper_frame, text="Ripeness")
+        self.raspberry_ripeness_label.grid(column=0, row=1, sticky=tk.W, **paddings)
+        self.raspberry_ripeness_value = tk.Entry(self.gripper_frame, textvariable=self.state.values["gripper.raspberry_ripeness"], state=tk.DISABLED, width=10)
+        self.raspberry_ripeness_value.grid(column=1, row=1, sticky=tk.W, **paddings)
+
+
+        self.raspberry_ripeness_r_label = tk.Label(self.gripper_frame, text="r")
+        self.raspberry_ripeness_r_label.grid(column=2, row=1, sticky=tk.W, **paddings)
+        self.raspberry_ripeness_r_value = tk.Entry(self.gripper_frame, textvariable=self.state.values["gripper.ripeness.r"], state=tk.DISABLED, width=5)
+        self.raspberry_ripeness_r_value.grid(column=3, row=1, sticky=tk.W, **paddings)
+
+        self.raspberry_ripeness_g_label = tk.Label(self.gripper_frame, text="g")
+        self.raspberry_ripeness_g_label.grid(column=4, row=1, sticky=tk.W, **paddings)
+        self.raspberry_ripeness_g_value = tk.Entry(self.gripper_frame, textvariable=self.state.values["gripper.ripeness.g"], state=tk.DISABLED, width=5)
+        self.raspberry_ripeness_g_value.grid(column=5, row=1, sticky=tk.W, **paddings)
+
+        self.raspberry_ripeness_b_label = tk.Label(self.gripper_frame, text="b")
+        self.raspberry_ripeness_b_label.grid(column=6, row=1, sticky=tk.W, **paddings)
+        self.raspberry_ripeness_b_value = tk.Entry(self.gripper_frame, textvariable=self.state.values["gripper.ripeness.b"], state=tk.DISABLED, width=5)
+        self.raspberry_ripeness_b_value.grid(column=7, row=1, sticky=tk.W, **paddings)
+
         # basket
         self.basket_frame = tk.Frame(self.right_frame, borderwidth=1, relief=tk.RIDGE)
         self.basket_frame.grid(column=0, row=2, sticky=tk.NSEW)
+
+        self.basket_fill_label = tk.Label(self.basket_frame, text="Fill")
+        self.basket_fill_label.grid(column=0, row=0, sticky=tk.W, **paddings)
+
+        self.basket_fill_small_label = tk.Label(self.basket_frame, text="Small")
+        self.basket_fill_small_label.grid(column=1, row=0, sticky=tk.W, **paddings)
+        self.basket_fill_small_value = tk.Entry(self.basket_frame, textvariable=self.state.values["basket.fill_count.small"], state=tk.DISABLED, width=5)
+        self.basket_fill_small_value.grid(column=2, row=0, sticky=tk.W, **paddings)
+
+        self.basket_fill_large_label = tk.Label(self.basket_frame, text="Large")
+        self.basket_fill_large_label.grid(column=3, row=0, sticky=tk.W, **paddings)
+        self.basket_fill_large_value = tk.Entry(self.basket_frame, textvariable=self.state.values["basket.fill_count.large"], state=tk.DISABLED, width=5)
+        self.basket_fill_large_value.grid(column=4, row=0, sticky=tk.W, **paddings)
+
+        self.basket_sorting_label = tk.Label(self.basket_frame, text="Sorting")
+        self.basket_sorting_label.grid(column=0, row=1, sticky=tk.W, **paddings)
+
+        self.basket_sorting_state_label = tk.Label(self.basket_frame, text="State")
+        self.basket_sorting_state_label.grid(column=1, row=1, sticky=tk.W, **paddings)
+        self.basket_sorting_state_options = tk.OptionMenu(
+            self.basket_frame,
+            self.state.values["basket.sorting.state"],
+            *self.sorting_states
+        )
+        self.basket_sorting_state_options.grid(column=2, row=1, sticky=tk.W, **paddings)
+
+        self.basket_sorting_position_label = tk.Label(self.basket_frame, text="Position")
+        self.basket_sorting_position_label.grid(column=3, row=1, sticky=tk.W, **paddings)
+        self.basket_sorting_position_label = tk.Entry(self.basket_frame, textvariable=self.state.values["basket.sorting.position"], state=tk.DISABLED, width=5)
+        self.basket_sorting_position_label.grid(column=4, row=1, sticky=tk.W, **paddings)
+
+
+
+        self.basket_door_label = tk.Label(self.basket_frame, text="Door")
+        self.basket_door_label.grid(column=0, row=2, sticky=tk.W, **paddings)
+
+        self.basket_door_state_label = tk.Label(self.basket_frame, text="State")
+        self.basket_door_state_label.grid(column=1, row=2, sticky=tk.W, **paddings)
+        self.basket_door_state_options = tk.OptionMenu(
+            self.basket_frame,
+            self.state.values["basket.door.state"],
+            *self.door_states
+        )
+        self.basket_door_state_options.grid(column=2, row=2, sticky=tk.W, **paddings)
+
+        self.basket_door_position_label = tk.Label(self.basket_frame, text="Position")
+        self.basket_door_position_label.grid(column=3, row=2, sticky=tk.W, **paddings)
+        self.basket_door_position_label = tk.Entry(self.basket_frame, textvariable=self.state.values["basket.door.position"], state=tk.DISABLED, width=5)
+        self.basket_door_position_label.grid(column=4, row=2, sticky=tk.W, **paddings)
 
         self.update_state()
 
@@ -93,7 +179,7 @@ class ControlCenter(tk.Tk):
 
             port_id = port.device
             port_name = port.name
-            port_desc = port.description if not (port.description == "n/a") else None
+            port_desc = port.manufacturer.split(" (")[0] if not (port.manufacturer is None) else None
 
             is_current = (port_id == self.state.port)
             self.port_list_menu.add_radiobutton(
@@ -112,40 +198,8 @@ class ControlCenter(tk.Tk):
         else:
             self.status_bar.config(text=f"Connected to {self.state.get_port()}")
 
-        if "controller.state" in self.state.values:
-            self.controller_state_var.set(self.state.values["controller.state"])
-        if "controller.program" in self.state.values:
-            self.controller_program_var.set(self.state.values["controller.program"])
-
-        # if "gripper.berry_p_small" in self.state.values:
-        #     self.gripper_berry_p_small_var.set(self.state.values["gripper.berry_p_small"])
-        # if "gripper.berry_p_large" in self.state.values:
-        #     self.gripper_berry_p_large_var.set(self.state.values["gripper.berry_p_large"])
-        # if "gripper.raspberry_size" in self.state.values:
-        #     self.gripper_raspberry_size_var.set(self.state.values["gripper.raspberry_size"])
-        # if "gripper.raspberry_ripeness" in self.state.values:
-        #     self.gripper_raspberry_ripeness_var.set(self.state.values["gripper.raspberry_ripeness"])
-        # if "gripper.ripeness.r" in self.state.values:
-        #     self.gripper_ripeness_r_var.set(self.state.values["gripper.ripeness.r"])
-        # if "gripper.ripeness.g" in self.state.values:
-        #     self.gripper_ripeness_g_var.set(self.state.values["gripper.ripeness.g"])
-        # if "gripper.ripeness.b" in self.state.values:
-        #     self.gripper_ripeness_b_var.set(self.state.values["gripper.ripeness.b"])
-
-        # if "basket.fill_count.small" in self.state.values:
-        #     self.basket_fill_count_small_var.set(self.state.values["basket.fill_count.small"])
-        # if "basket.fill_count.large" in self.state.values:
-        #     self.basket_fill_count_large_var.set(self.state.values["basket.fill_count.large"])
-        # if "basket.sorting.state" in self.state.values:
-        #     self.basket_sorting_state_var.set(self.state.values["basket.sorting.state"])
-        # if "basket.sorting.position" in self.state.values:
-        #     self.basket_sorting_position_var.set(self.state.values["basket.sorting.position"])
-        # if "basket.door.position" in self.state.values:
-        #     self.basket_door_position_var.set(self.state.values["basket.door.position"])
-        # if "basket.door.state" in self.state.values:
-        #     self.basket_door_state_var.set(self.state.values["basket.door.state"])
-
-        self.after(100, self.update_state)
+        self.state.update_color_sensor_plot()
+        self.after(75, self.update_state)
 
 
 if __name__ == "__main__":

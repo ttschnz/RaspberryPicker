@@ -6,6 +6,7 @@ pkgs.mkShell {
     pkgs.tk
     pkgs.python312Packages.pip
     pkgs.python312Packages.tkinter
+    pkgs.python312Packages.numpy
   ];
 
   shellHook = ''
