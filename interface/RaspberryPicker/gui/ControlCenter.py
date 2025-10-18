@@ -9,6 +9,7 @@ class ControlCenter(ctk.CTk):
     controller_programs = ("CLOSE", "RELEASE", "DROP", "RESET", "CALIBRATE_COLOR")
     sorting_states = ("LARGE", "SMALL", "IDLE")
     door_states = ("OPEN_SMALL", "OPEN_LARGE", "CLOSED")
+    grabber_states = ("OPEN", "CLOSED")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -51,6 +52,10 @@ class ControlCenter(ctk.CTk):
         self.main_frame.grid_columnconfigure(0, weight=1, minsize=200)
         self.main_frame.grid_columnconfigure(1, weight=0, minsize=300)
         self.main_frame.grid_rowconfigure(0, weight=1)
+        # Left panel: log
+        self.logs = ctk.CTkTextbox(self.main_frame, state=ctk.DISABLED)
+        self.logs.grid(column=0, row=0, sticky=ctk.NSEW)
+
 
         # Right panel
         self.right_frame = ctk.CTkFrame(self.main_frame)
@@ -82,21 +87,33 @@ class ControlCenter(ctk.CTk):
         self.gripper_frame = ctk.CTkFrame(self.right_frame)
         self.gripper_frame.grid(column=0, row=1, sticky="nsew", **paddings)
 
-        ctk.CTkLabel(self.gripper_frame, text="Size").grid(column=0, row=0, sticky="w", **paddings)
-        ctk.CTkEntry(self.gripper_frame, textvariable=self.state_manager.values["gripper.raspberry_size"], state="disabled", width=80).grid(column=1, row=0, **paddings)
+        ctk.CTkLabel(self.gripper_frame, text="Grabber").grid(column=0, row=0, sticky="w", **paddings)
+        self.gripper_grabber_state_options = ctk.CTkOptionMenu(
+            self.gripper_frame,
+            variable=self.state_manager.values["gripper.grabber_state"],
+            values=list(self.grabber_states)
+        )
+        self.gripper_grabber_state_options.grid(column=1, row=0, sticky="w", **paddings)
 
-        ctk.CTkLabel(self.gripper_frame, text="p_s").grid(column=2, row=0, sticky="w", **paddings)
-        ctk.CTkEntry(self.gripper_frame, textvariable=self.state_manager.values["gripper.berry_p_small"], state="disabled", width=50).grid(column=3, row=0, **paddings)
+        ctk.CTkLabel(self.gripper_frame, text="Position").grid(column=2, row=0, sticky="w", **paddings)
+        ctk.CTkEntry(self.gripper_frame, textvariable=self.state_manager.values["gripper.plate_distance"], state="disabled", width=80).grid(column=3, row=0, **paddings)
 
-        ctk.CTkLabel(self.gripper_frame, text="p_l").grid(column=4, row=0, sticky="w", **paddings)
-        ctk.CTkEntry(self.gripper_frame, textvariable=self.state_manager.values["gripper.berry_p_large"], state="disabled", width=50).grid(column=5, row=0, **paddings)
 
-        ctk.CTkLabel(self.gripper_frame, text="Ripeness").grid(column=0, row=1, sticky="w", **paddings)
-        ctk.CTkEntry(self.gripper_frame, textvariable=self.state_manager.values["gripper.raspberry_ripeness"], state="disabled", width=80).grid(column=1, row=1, **paddings)
+        ctk.CTkLabel(self.gripper_frame, text="Size").grid(column=0, row=1, sticky="w", **paddings)
+        ctk.CTkEntry(self.gripper_frame, textvariable=self.state_manager.values["gripper.raspberry_size"], state="disabled", width=80).grid(column=1, row=1, **paddings)
+
+        ctk.CTkLabel(self.gripper_frame, text="p_s").grid(column=2, row=1, sticky="w", **paddings)
+        ctk.CTkEntry(self.gripper_frame, textvariable=self.state_manager.values["gripper.berry_p_small"], state="disabled", width=50).grid(column=3, row=1, **paddings)
+
+        ctk.CTkLabel(self.gripper_frame, text="p_l").grid(column=4, row=1, sticky="w", **paddings)
+        ctk.CTkEntry(self.gripper_frame, textvariable=self.state_manager.values["gripper.berry_p_large"], state="disabled", width=50).grid(column=5, row=1, **paddings)
+
+        ctk.CTkLabel(self.gripper_frame, text="Ripeness").grid(column=0, row=2, sticky="w", **paddings)
+        ctk.CTkEntry(self.gripper_frame, textvariable=self.state_manager.values["gripper.raspberry_ripeness"], state="disabled", width=80).grid(column=1, row=2, **paddings)
 
         for i, (color, var) in enumerate([("r", "gripper.ripeness.r"), ("g", "gripper.ripeness.g"), ("b", "gripper.ripeness.b")]):
-            ctk.CTkLabel(self.gripper_frame, text=color).grid(column=2 + i*2, row=1, sticky="w", **paddings)
-            ctk.CTkEntry(self.gripper_frame, textvariable=self.state_manager.values[var], state="disabled", width=50).grid(column=3 + i*2, row=1, **paddings)
+            ctk.CTkLabel(self.gripper_frame, text=color).grid(column=2 + i*2, row=2, sticky="w", **paddings)
+            ctk.CTkEntry(self.gripper_frame, textvariable=self.state_manager.values[var], state="disabled", width=50).grid(column=3 + i*2, row=2, **paddings)
 
         # Basket section
         self.basket_frame = ctk.CTkFrame(self.right_frame)
@@ -150,7 +167,10 @@ class ControlCenter(ctk.CTk):
         else:
             self.status_bar.configure(text=f"Connected to {self.state_manager.get_port()}")
 
+        self.state_manager.listen_values()
+
         self.state_manager.update_color_sensor_plot()
+
         self.after(75, self.update_state)
 
 

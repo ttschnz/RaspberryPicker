@@ -22,7 +22,9 @@ class ValueVar(tk.StringVar):
     def set(self, value: str) -> None:
         super().set(value)
         self.state.send(self._name, value)
-        pass
+
+    def _set(self, value: str) -> None:
+        super().set(value)
 
 class State:
     port = None
@@ -58,15 +60,22 @@ class State:
             return False
 
         while (self.arduino.in_waiting>0):
-            line = self.arduino.readline().decode('utf-8')
-            print(f"> {line}")
-            key, value = line.split("=",1)
-            self.values[key].set(value)
+            try:
+                line = self.arduino.readline().decode('utf-8').strip()
+                print(f"> {line}")
+                self.control_center.logs.configure(state="normal")
+                self.control_center.logs.insert("end", f"\n{line}")
+                self.control_center.logs.configure(state="disabled")
+                self.control_center.logs.see("end")
+                if "=" in line:
+                    key, value = line.split("=",1)
+                    self.values[key]._set(value)
 
-            # gripper.ripeness.g
-            if key.startswith("gripper.ripeness."):
-                self.color_sensor_values[key.split(".")[-1]].append(int(value))
-
+                    # gripper.ripeness.[r,g,b]
+                    if key.startswith("gripper.ripeness."):
+                        self.color_sensor_values[key.split(".")[-1]].append(float(value))
+            except:
+                pass
         return True
 
     def send(self, key, value)->bool:
@@ -84,9 +93,6 @@ class State:
 
 
     def update_color_sensor_plot(self):
-        self.color_sensor_values["r"].append([int(x) for x in numpy.random.random(2)*100])
-        self.color_sensor_values["g"].append([int(x) for x in numpy.random.random(2)*100])
-        self.color_sensor_values["b"].append([int(x) for x in numpy.random.random(2)*100])
         if self.fig is None:
             self.fig = Figure(figsize = (5, 2), dpi = 100)
             self.plt = self.fig.add_subplot(111)
@@ -99,5 +105,5 @@ class State:
         self.plt.plot(self.color_sensor_values["b"], color='blue', label='Blue Line')
 
         self.canvas.draw()
-        self.canvas.get_tk_widget().grid(column=0, row=3, sticky=tk.W, columnspan=8)
+        self.canvas.get_tk_widget().grid(column=0, row=4, sticky=tk.W, columnspan=8,padx=10,pady=5)
         pass

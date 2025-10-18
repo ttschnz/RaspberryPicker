@@ -6,14 +6,16 @@
 
 #include "Gripper/Gripper.h"
 #include "Gripper/GrabberStepper.h"
-
 Controller::Controller(State state){
+    Controller(state, nullptr);
+}
+Controller::Controller(State state, InterfaceMaster *interface){
     if (state == State::PROGRAM){
         state = State::IDLE; // default to idle
     }
     this->basket_controller = nullptr;
     this->gripper_controller = nullptr;
-    this->interface = nullptr;
+    this->interface = interface;
     this->set_state(state);
 }
 
@@ -33,14 +35,14 @@ void Controller::set_program(Controller::Program program){
     this->set_state(Controller::State::PROGRAM);
     this->program = program;
     if(this->interface != nullptr){
-        this->interface->send_state("controller.program", Controller::serialize_program(program));
+        this->interface->send_state("controller.program", this->serialize_program(this->get_program()));
     }
 }
 
 void Controller::set_state(Controller::State state){
     this->state = state;
     if(this->interface != nullptr){
-        this->interface->send_state("controller.state", Controller::serialize_state(state));
+        this->interface->send_state("controller.state", this->serialize_state(this->get_state()));
     }
 }
 
@@ -56,7 +58,7 @@ void Controller::add_interface(InterfaceMaster* interface){
 void Controller::run_close(){
     // color sensor
     bool is_ripe = this->gripper_controller->is_ripe();
-    this->interface->send_state("gripper.raspberry_ripeness", is_ripe);
+    this->interface->send_state("gripper.raspberry_ripeness", is_ripe ? "RIPE" : "UNRIPE");
 
     if (!is_ripe){
         return;
@@ -76,26 +78,25 @@ void Controller::run_close(){
             this->basket_controller->set_sorting(SortingState::SMALL);
             break;
     }
-
-    // ready for pull down
-    // TODO: How do we indicate readyness?
 }
 
 void Controller::run_release(){
     this->gripper_controller->set_grabber(GrabberState::OPEN);
-    this->basket_controller->increment_counter(); // TODO: handle return value
+    if (this->basket_controller->increment_counter()==false){
+        Serial.println((String)"cannot increment counter on sorting state " + sorting_state_to_str(this->basket_controller->sorting_state));
+    }
 }
 
 void Controller::run_drop(){
     FillCount fill_count = this->basket_controller->fill_count;
     if (fill_count.fill_large >= DoorValues::max_fill){
         this->basket_controller->set_door(DoorState::OPEN_LARGE);
-        this->basket_controller->reset_counter();
+        this->basket_controller->reset_counter(false);
         this->basket_controller->set_door(DoorState::CLOSED);
     }
     if (fill_count.fill_small >= DoorValues::max_fill){
         this->basket_controller->set_door(DoorState::OPEN_SMALL);
-        this->basket_controller->reset_counter();
+        this->basket_controller->reset_counter(false);
         this->basket_controller->set_door(DoorState::CLOSED);
     }
 }
@@ -104,16 +105,26 @@ void Controller::run_reset(){
     this->gripper_controller->set_grabber(GrabberState::OPEN);
     this->basket_controller->set_door(DoorState::CLOSED);
     this->basket_controller->set_sorting(SortingState::IDLE);
+    this->basket_controller->reset_counter(true);
 }
 
 void Controller::run_calibrate_color(){
+    Serial.println("calibrating colors");
     this->gripper_controller->color_sensor->calibrate();
 }
 
 
 const char* Controller::serialize_program(Program program){
-    int idx = (int)program;
-    return Controller::program_strings[idx];
+    int idx = static_cast<int>(program);
+
+    const char * program_strings[5] ={
+        "CLOSE",
+        "RELEASE",
+        "DROP",
+        "RESET",
+        "CALIBRATE_COLOR"
+    };
+    return program_strings[idx];
 }
 bool Controller::deserialize_program(String program, Controller::Program* out_program){
     bool matched = true;
@@ -134,8 +145,13 @@ bool Controller::deserialize_program(String program, Controller::Program* out_pr
 }
 
 const char* Controller::serialize_state(State state){
-    int idx = (int)program;
-    return Controller::state_strings[idx];
+    int idx = static_cast<int>(state);
+    const char* state_strings[3] = {
+        "MANUAL",
+        "IDLE",
+        "PROGRAM"
+    };
+    return state_strings[idx];
 }
 
 bool Controller::deserialize_state(String state, Controller::State* out_state){

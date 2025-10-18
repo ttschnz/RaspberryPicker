@@ -20,6 +20,7 @@ const int ColorSensor::delay_calibrate = 2000;
 const float GrabberStepperMotorValues::transmission_ratio = 1.5 * 18 * PI;
 const int GrabberStepperMotorValues::measuring_interval = 1;
 const int GrabberStepperMotorValues::plate_distance = 90;
+const int GrabberStepperMotorValues::plate_distance_min = 5;
 const int GrabberStepperMotorValues::steps_per_revolution = 300;
 const int GrabberStepperMotorValues::speed = 300;
 const float PressureSensor::berry_size_small_standard_deviation = 0;
@@ -30,10 +31,10 @@ const int PressureSensor::pressure_sensor_thresholds[2] = {1023,1023};
 
 GripperController::GripperController(GripperPinout *pinout, InterfaceMaster *interface){
     this->interface = interface;
-
+    this->grabber_state = GrabberState::OPEN;
     this->color_sensor = new ColorSensor(pinout->color_sensor_pinout);
     this->pressure_sensor = new PressureSensor(pinout->pressure_sensor_pins);
-
+    this->plate_distance = GrabberStepperMotorValues::plate_distance;
     this->plate_stepper = new Stepper(
         GrabberStepperMotorValues::steps_per_revolution,
         pinout->stepper_motor_pins[0],
@@ -64,8 +65,6 @@ bool str_to_raspberry_size(String raspberry_size_str, RaspberrySize* out_raspber
 
 
 RaspberrySize GripperController::set_grabber(GrabberState desired_grabber_state){
-    // close until the plates get touch feedback
-
     // [stp] = [mm]/([mm/rot]*[rot/stp])
     int steps_per_interval =
         GrabberStepperMotorValues::measuring_interval / (   // [mm]
@@ -80,44 +79,82 @@ RaspberrySize GripperController::set_grabber(GrabberState desired_grabber_state)
             GrabberStepperMotorValues::steps_per_revolution // [stp/rot]
         );
 
-    int steps = 0;
-    while(!this->pressure_sensor->is_touching()){
-        this->plate_stepper->step(steps_per_interval);
-        steps++;
-        delay(ms_per_step * steps_per_interval);
+    switch (desired_grabber_state){
+        case GrabberState::OPEN:
+            {
+                int steps_til_open =
+                    GrabberStepperMotorValues::steps_per_revolution /
+                    GrabberStepperMotorValues::transmission_ratio * (this->plate_distance - GrabberStepperMotorValues::plate_distance);
+                Serial.println((String)+"Steps until open: " + steps_til_open);
+
+                this->plate_stepper->step(steps_til_open);
+
+                delay(abs(ms_per_step * steps_til_open));
+
+                this->plate_distance = this->plate_distance -
+                    steps_til_open *  // [stp]
+                    GrabberStepperMotorValues::transmission_ratio /     // [mm/rot]
+                    GrabberStepperMotorValues::steps_per_revolution;    // [rot/stp]
+
+                this->grabber_state = GrabberState::OPEN;
+                this->interface->send_state("gripper.grabber_state", grabber_state_to_str(this->grabber_state));
+                this->interface->send_state("gripper.plate_distance", this->plate_distance);
+            }
+            break;
+        case GrabberState::CLOSED:
+            {
+                // close until the plates get touch feedback
+                int steps = 0;
+                while(!this->pressure_sensor->is_touching() && this->plate_distance >= GrabberStepperMotorValues::plate_distance_min){
+
+                    this->plate_stepper->step(steps_per_interval);
+
+                    steps++;
+
+                    // [mm] = [stp] * [mm/rot] / [stp/rot]
+                    this->plate_distance = GrabberStepperMotorValues::plate_distance -
+                        steps *  // [stp]
+                        GrabberStepperMotorValues::transmission_ratio /     // [mm/rot]
+                        GrabberStepperMotorValues::steps_per_revolution;    // [rot/stp]
+                    this->interface->send_state("gripper.plate_distance", this->plate_distance);
+
+                    delay(abs(ms_per_step * steps_per_interval));
+                }
+
+                this->grabber_state = GrabberState::CLOSED;
+                this->interface->send_state("gripper.grabber_state", grabber_state_to_str(this->grabber_state));
+
+                float raspberry_width = this->plate_distance;
+
+                // z = (x - mean) / stdev
+                float z_large = (
+                        raspberry_width-PressureSensor::berry_size_large_mean
+                    ) / PressureSensor::berry_size_large_standard_deviation;
+
+                float z_small = (
+                        raspberry_width-PressureSensor::berry_size_small_mean
+                    ) / PressureSensor::berry_size_small_standard_deviation;
+
+                float p_w_given_L = gaussian_pdf(z_large);
+                float p_w_given_S = gaussian_pdf(z_small);
+
+                float p_L = 0.5, p_S = 0.5;
+
+                float probability_large = p_w_given_L * p_L / (p_w_given_L * p_L + p_w_given_S * p_S);
+                float probability_small = p_w_given_S * p_L / (p_w_given_L * p_L + p_w_given_S * p_S);
+
+                this->interface->send_state("gripper.berry_p_large", probability_large);
+                this->interface->send_state("gripper.berry_p_small", probability_small);
+
+                if (probability_large>probability_small){
+                    return RaspberrySize::LARGE;
+                }else{
+                    return RaspberrySize::SMALL;
+                }
+            }
+            break;
     }
 
-    // [mm] = [stp] * [mm/rot] / [stp/rot]
-    float raspberry_width = GrabberStepperMotorValues::plate_distance -
-        steps *  // [stp]
-        GrabberStepperMotorValues::transmission_ratio /     // [mm/rot]
-        GrabberStepperMotorValues::steps_per_revolution;    // [rot/stp]
-
-    // z = (x - mean) / stdev
-    float z_large = (
-            raspberry_width-PressureSensor::berry_size_large_mean
-        ) / PressureSensor::berry_size_large_standard_deviation;
-
-    float z_small = (
-            raspberry_width-PressureSensor::berry_size_small_mean
-        ) / PressureSensor::berry_size_small_standard_deviation;
-
-    float p_w_given_L = gaussian_pdf(z_large);
-    float p_w_given_S = gaussian_pdf(z_small);
-
-    float p_L = 0.5, p_S = 0.5;
-
-    float probability_large = p_w_given_L * p_L / (p_w_given_L * p_L + p_w_given_S * p_S);
-    float probability_small = p_w_given_S * p_L / (p_w_given_L * p_L + p_w_given_S * p_S);
-
-    this->interface->send_state("gripper.berry_p_large", probability_large);
-    this->interface->send_state("gripper.berry_p_small", probability_small);
-
-    if (probability_large>probability_small){
-        return RaspberrySize::LARGE;
-    }else{
-        return RaspberrySize::SMALL;
-    }
 }
 
 bool GripperController::is_ripe(){

@@ -26,6 +26,7 @@ class GrabberStepperMotorValues
         static const int speed;                // speed (RPM) to use while driving
         static const float transmission_ratio; // how many mm does the plate move per rotation? [mm/rot] module * Z * pi
         static const int plate_distance;       // how many mm do we want the plates to be apart from each other in the open state?
+        static const int plate_distance_min;   // what is the minimal distance we should keep between plates? [mm]
         static const int measuring_interval;   // how many mm do we move until we check if we have pressure?
 };
 

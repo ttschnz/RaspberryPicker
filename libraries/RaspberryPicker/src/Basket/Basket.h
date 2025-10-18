@@ -47,7 +47,7 @@ class BasketController {
         /**
          * resets the counter for the currently open door. returns false if no door is open
          */
-        bool reset_counter();
+        bool reset_counter(bool force);
 
         /**
          * returns the position to whchi the servo has to move in order to reach a certain state
@@ -65,11 +65,11 @@ class BasketController {
         bool increment_counter();
 
         FillCount fill_count;
+        SortingState sorting_state;
     private:
         Servo sorting_servo;
         Servo door_servo;
         int sorting_pos;
-        SortingState sorting_state;
         int door_pos;
         DoorState door_state;
         InterfaceMaster *interface;

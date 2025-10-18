@@ -19,12 +19,6 @@ GripperPinout gripper_pinout {
     .stepper_motor_pins = {8,9,10,11},
 };
 
-InterfaceConfiguration interface_configuration {
-    .rx_pin = 3,
-    .tx_pin = 4,
-    .baud_rate = 9600,
-};
-
 BasketController* basket_controller;
 GripperController* gripper_controller;
 InterfaceMaster* interface_master;
@@ -37,10 +31,11 @@ void setup() {
 
     Serial.println("initialising");
 
-    controller = new Controller(Controller::State::IDLE);
+    interface_master = new InterfaceMaster();
+    Serial.println("interface ready");
+
+    controller = new Controller(Controller::State::IDLE, interface_master);
     Serial.println("controller created");
-    interface_master = new InterfaceMaster(&interface_configuration);
-    Serial.println("webinterface ready");
 
     basket_controller = new BasketController(&basket_pinout, interface_master);
     Serial.println("basket controller ready");
@@ -48,13 +43,12 @@ void setup() {
     Serial.println("gripper controller ready");
 
     interface_master->add_controllers(basket_controller, gripper_controller);
-    Serial.println("controller connected to webinterface");
+    interface_master->controller = controller;
+    Serial.println("controller connected to interface");
     controller->add_controllers(basket_controller, gripper_controller);
     Serial.println("controllers connected to main controller");
     controller->add_interface(interface_master);
     Serial.println("interface connected to main controller");
-
-
 }
 
 void loop() {
@@ -71,6 +65,9 @@ void loop() {
                 case Controller::Program::CLOSE:
                     controller->run_close();
                     break;
+                case Controller::Program::RELEASE:
+                    controller->run_release();
+                    break;
                 case Controller::Program::DROP:
                     controller->run_drop();
                     break;
@@ -78,10 +75,12 @@ void loop() {
                     controller->run_reset();
                     break;
                 case Controller::Program::CALIBRATE_COLOR:
+                    Serial.println("running calibrate color");
                     controller->run_calibrate_color();
                     break;
-                controller->set_state(Controller::State::IDLE);
             }
+            controller->set_state(Controller::State::IDLE);
             break;
     }
+    delay(1000); // for stability
 }

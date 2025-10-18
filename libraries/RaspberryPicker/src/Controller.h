@@ -15,11 +15,8 @@ class Controller{
             IDLE,
             PROGRAM,
         };
-        const char* state_strings[3] = {
-            "MANUAL",
-            "IDLE",
-            "PROGRAM",
-        };
+
+
         enum Program{
             CLOSE,
             RELEASE,
@@ -27,13 +24,7 @@ class Controller{
             RESET,
             CALIBRATE_COLOR,
         };
-        const char* program_strings[5] = {
-            "CLOSE",
-            "RELEASE",
-            "DROP",
-            "RESET",
-            "CALIBRATE_COLOR",
-        };
+
         const char* serialize_program(Program program);
         bool deserialize_program(String program, Program* out_program);
         const char* serialize_state(State state);
@@ -41,6 +32,7 @@ class Controller{
 
         Controller(State state);
         Controller(Program program);
+        Controller(State state, InterfaceMaster *interface);
 
         State get_state();
         Program get_program();

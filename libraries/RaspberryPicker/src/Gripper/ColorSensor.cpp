@@ -63,20 +63,17 @@ RGB ColorSensor::measure_rgb(){
 
 
 void ColorSensor::calibrate(){
-    if (Serial){
-        Serial.println("calibrating white");
-    }
+    Serial.println("calibrating white");
     delay(ColorSensor::delay_calibrate);
     RGB raw_white;
     this->measure_rgb_raw(&raw_white.r, &raw_white.g, &raw_white.b);
 
-    if (Serial){
-        Serial.println("calibrating black");
-    }
+    Serial.println("calibrating black");
     delay(ColorSensor::delay_calibrate);
     RGB raw_black;
     this->measure_rgb_raw(&raw_black.r, &raw_black.g, &raw_black.b);
 
     this->white = raw_white;
     this->black = raw_black;
+    Serial.println("calibrated");
 }

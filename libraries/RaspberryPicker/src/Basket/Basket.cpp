@@ -40,7 +40,7 @@ BasketController::BasketController(BasketPinout *pinout,InterfaceMaster *interfa
 int BasketController::get_desired_door_pos(DoorState new_door_state){
     int desired_pos;
 
-    switch (this->door_state){
+    switch (new_door_state){
         case DoorState::CLOSED:
             desired_pos = DoorValues::closed_pos;
             break;
@@ -51,6 +51,7 @@ int BasketController::get_desired_door_pos(DoorState new_door_state){
             desired_pos = DoorValues::open_large_pos;
             break;
     };
+    Serial.println((String)"desired door pos: " + desired_pos);
     return desired_pos;
 }
 
@@ -65,27 +66,27 @@ void BasketController::set_door(DoorState target_state){
     this->interface->send_state("basket.door.position", target_position);
 }
 
-bool BasketController::reset_counter(){
-    switch (this->door_state) {
-        case DoorState::CLOSED:
-            return false;
-            break;
-        case DoorState::OPEN_SMALL:
+bool BasketController::reset_counter(bool force){
+    bool reset_large = (this->door_state == DoorState::OPEN_LARGE) || force;
+    bool reset_small = (this->door_state == DoorState::OPEN_SMALL) || force;
+
+    if (reset_small){
             this->fill_count.fill_small = 0;
             this->interface->send_state("basket.fill_count.small", this->fill_count.fill_small);
-            break;
-        case DoorState::OPEN_LARGE:
+    }
+
+    if(reset_large){
             this->fill_count.fill_large = 0;
             this->interface->send_state("basket.fill_count.large", this->fill_count.fill_large);
-            break;
     }
-    return true;
+
+    return reset_large || reset_small;
 }
 
 int BasketController::get_desired_sorting_pos(SortingState new_sorting_state){
     int desired_pos;
 
-    switch (this->sorting_state){
+    switch (new_sorting_state){
         case SortingState::IDLE:
             desired_pos = SortingServoValues::idle_pos;
             break;

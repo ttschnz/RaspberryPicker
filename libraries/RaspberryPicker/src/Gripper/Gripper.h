@@ -45,7 +45,8 @@ class GripperController{
         ~GripperController() {
             delete plate_stepper;  // prevent memory leak
         }
-
+        GrabberState grabber_state;
+        float plate_distance;
         Stepper *plate_stepper;
         InterfaceMaster *interface;
         PressureSensor *pressure_sensor;
