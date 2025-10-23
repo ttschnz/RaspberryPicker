@@ -18,6 +18,10 @@ typedef struct {
     int fill_large;
 } FillCount;
 
+/**
+ * Pinout of the Basket
+ * each pin represents the digital pin where the servo motors are plugged in
+ */
 typedef struct {
     int sorting_pin;
     int door_pin;
@@ -29,28 +33,28 @@ typedef struct {
 class BasketController {
     public:
         /**
-        * Initialise the basket controller. Call during setup.
+        * Initialise the basket controller. Call this during setup.
         */
         BasketController(BasketPinout *pinout, InterfaceMaster *interface);
 
         /**
-         * Reads the opening state from the position and last command
+         * Gets the angle to be sent to the door servo motor based on the desired state.
          */
         int get_desired_door_pos(DoorState desired_door_state);
 
         /**
-         * opens the basket if it is ready. returns false if the door is not ready to be closed.
-         * door: 0 for small, 1 for large.
+         * opens or closes the basket's door synchronously (wait until done).
          */
         void set_door(DoorState target_state);
 
         /**
-         * resets the counter for the currently open door. returns false if no door is open
+         * resets the counter for the currently open door.
+         * returns false if no door is open
          */
         bool reset_counter(bool force);
 
         /**
-         * returns the position to whchi the servo has to move in order to reach a certain state
+         * * Gets the angle to be sent to the sorting servo motor based on the desired state.
          */
         int get_desired_sorting_pos(SortingState desired_sorting_state);
 

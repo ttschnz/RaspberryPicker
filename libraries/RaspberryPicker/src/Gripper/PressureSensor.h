@@ -22,10 +22,21 @@ class PressureSensor{
         };
 
 
-
+        /**
+         * turns the state (enum) to a string
+         */
         static const char* pressure_state_to_str(PressureState pressure_state);
+
+        /**
+         * Parses the state (string) to an instance of its enum. returns false if there is no match.
+         */
         static bool str_to_pressure_state(String pressure_state_str, PressureState* out_pressure_state);
 
+        /**
+         * returns true if the pressure sensor's reading is high enough
+         * (i.e. we think the plates touch a berry)
+         * returns false if this is not the case.
+         */
         bool is_touching();
     private:
         int pinout[2];

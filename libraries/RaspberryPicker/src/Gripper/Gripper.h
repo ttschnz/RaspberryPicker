@@ -32,13 +32,29 @@ bool str_to_raspberry_size(String raspberry_size_str, RaspberrySize* out_raspber
 class GripperController{
     public:
         /**
-        *
+        * Initialises the controller for the gripper subcontroller. This also
+        * initialises all subcomponents of this controller, such as sensors and
+        * motors.
+        * Call this during setup.
         */
         GripperController(GripperPinout *pinout,InterfaceMaster *interface);
 
+        /**
+         * sets the grabber to a certain state:
+         * - Open: calculates how many steps need to be done in order to be open
+         * - Close: closes the grabber in small intervals and measures each time
+         *          if we are allready touching the berry or not. It then
+         *          evaluates the size of the berry we are touching and returns
+         *          the more likely size.
+         */
         RaspberrySize set_grabber(GrabberState desired_grabber_state);
+
+        /**
+         * returns true if the color sensor thinks the berry is ripe.
+         * returns false if not
+         */
         bool is_ripe();
-        bool is_touching();
+
         ColorSensor *color_sensor;
     private:
 

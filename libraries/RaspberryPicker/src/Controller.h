@@ -79,6 +79,12 @@ class Controller{
          */
         void run_reset();
 
+        /**
+         * Program CALIBRATE_COLOR:
+         * Used to calibrate the color sensor
+         * - first white
+         * - then black
+         */
         void run_calibrate_color();
 
     private:
