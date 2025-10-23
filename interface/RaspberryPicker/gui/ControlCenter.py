@@ -9,7 +9,7 @@ class ControlCenter(ctk.CTk):
     controller_programs = ("CLOSE", "RELEASE", "DROP", "RESET", "CALIBRATE_COLOR")
     sorting_states = ("LARGE", "SMALL", "IDLE")
     door_states = ("OPEN_SMALL", "OPEN_LARGE", "CLOSED")
-    grabber_states = ("OPEN", "CLOSED")
+    gripper_states = ("OPEN", "CLOSED")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -87,13 +87,13 @@ class ControlCenter(ctk.CTk):
         self.gripper_frame = ctk.CTkFrame(self.right_frame)
         self.gripper_frame.grid(column=0, row=1, sticky="nsew", **paddings)
 
-        ctk.CTkLabel(self.gripper_frame, text="Grabber").grid(column=0, row=0, sticky="w", **paddings)
-        self.gripper_grabber_state_options = ctk.CTkOptionMenu(
+        ctk.CTkLabel(self.gripper_frame, text="Gripper").grid(column=0, row=0, sticky="w", **paddings)
+        self.gripper_gripper_state_options = ctk.CTkOptionMenu(
             self.gripper_frame,
-            variable=self.state_manager.values["gripper.grabber_state"],
-            values=list(self.grabber_states)
+            variable=self.state_manager.values["gripper.gripper_state"],
+            values=list(self.gripper_states)
         )
-        self.gripper_grabber_state_options.grid(column=1, row=0, sticky="w", **paddings)
+        self.gripper_gripper_state_options.grid(column=1, row=0, sticky="w", **paddings)
 
         ctk.CTkLabel(self.gripper_frame, text="Position").grid(column=2, row=0, sticky="w", **paddings)
         ctk.CTkEntry(self.gripper_frame, textvariable=self.state_manager.values["gripper.plate_distance"], state="disabled", width=80).grid(column=3, row=0, **paddings)

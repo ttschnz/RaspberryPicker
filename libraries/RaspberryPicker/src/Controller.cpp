@@ -5,7 +5,7 @@
 #include "Basket/Sorting.h"
 
 #include "Gripper/Gripper.h"
-#include "Gripper/GrabberStepper.h"
+#include "Gripper/GripperStepper.h"
 Controller::Controller(State state){
     Controller(state, nullptr);
 }
@@ -65,23 +65,23 @@ void Controller::run_close(){
     }
 
     // close grabbing mechanism
-    GrabberStepper::RaspberrySize size = this->gripper_controller->set_grabber(GrabberStepper::GrabberState::CLOSED);
-    this->interface->send_state("gripper.raspberry_size", GrabberStepper::serialize_raspberry_size(size));
+    GripperStepper::RaspberrySize size = this->gripper_controller->set_gripper(GripperStepper::GripperState::CLOSED);
+    this->interface->send_state("gripper.raspberry_size", GripperStepper::serialize_raspberry_size(size));
 
 
     // set sorting to the correct position
     switch(size){
-        case GrabberStepper::RaspberrySize::LARGE:
+        case GripperStepper::RaspberrySize::LARGE:
             this->basket_controller->set_sorting(BasketSorter::SortingState::LARGE);
             break;
-        case GrabberStepper::RaspberrySize::SMALL:
+        case GripperStepper::RaspberrySize::SMALL:
             this->basket_controller->set_sorting(BasketSorter::SortingState::SMALL);
             break;
     }
 }
 
 void Controller::run_release(){
-    this->gripper_controller->set_grabber(GrabberStepper::GrabberState::OPEN);
+    this->gripper_controller->set_gripper(GripperStepper::GripperState::OPEN);
     if (this->basket_controller->increment_counter()==false){
         Serial.println((String)"cannot increment counter on sorting state " + BasketSorter::serialize_sorting_state(this->basket_controller->sorting_state));
     }
@@ -102,7 +102,7 @@ void Controller::run_drop(){
 }
 
 void Controller::run_reset(){
-    this->gripper_controller->set_grabber(GrabberStepper::GrabberState::OPEN);
+    this->gripper_controller->set_gripper(GripperStepper::GripperState::OPEN);
     this->basket_controller->set_door(BasketDoor::DoorState::CLOSED);
     this->basket_controller->set_sorting(BasketSorter::SortingState::IDLE);
     this->basket_controller->reset_counter(true);

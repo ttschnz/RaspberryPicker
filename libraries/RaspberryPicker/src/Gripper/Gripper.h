@@ -8,7 +8,7 @@
 
 #include "ColorSensor.h"
 #include "PressureSensor.h"
-#include "GrabberStepper.h"
+#include "GripperStepper.h"
 
 typedef struct {
     ColorSensor::Pinout color_sensor_pinout;
@@ -30,14 +30,14 @@ class GripperController{
         GripperController(GripperPinout *pinout,InterfaceMaster *interface);
 
         /**
-         * sets the grabber to a certain state:
+         * sets the gripper to a certain state:
          * - Open: calculates how many steps need to be done in order to be open
-         * - Close: closes the grabber in small intervals and measures each time
+         * - Close: closes the gripper in small intervals and measures each time
          *          if we are allready touching the berry or not. It then
          *          evaluates the size of the berry we are touching and returns
          *          the more likely size.
          */
-        GrabberStepper::RaspberrySize set_grabber(GrabberStepper::GrabberState desired_grabber_state);
+        GripperStepper::RaspberrySize set_gripper(GripperStepper::GripperState desired_gripper_state);
 
         /**
          * returns true if the color sensor thinks the berry is ripe.
@@ -51,7 +51,7 @@ class GripperController{
         ~GripperController() {
             delete plate_stepper;  // prevent memory leak
         }
-        GrabberStepper::GrabberState grabber_state;
+        GripperStepper::GripperState gripper_state;
         float plate_distance;
         Stepper *plate_stepper;
         InterfaceMaster *interface;

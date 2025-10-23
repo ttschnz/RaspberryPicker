@@ -5,7 +5,7 @@
 #define PI 3.141592653589793
 #endif
 
-static const char* grabber_state_strings[2] = {
+static const char* gripper_state_strings[2] = {
     "OPEN",
     "CLOSED"
 };
@@ -15,7 +15,7 @@ static const char* raspberry_size_strings[] = {
     "SMALL"
 };
 
-class GrabberStepper
+class GripperStepper
 {
 
     public:
@@ -24,19 +24,19 @@ class GrabberStepper
             SMALL
         };
 
-        static const char* serialize_raspberry_size(GrabberStepper::RaspberrySize raspberry_size);
+        static const char* serialize_raspberry_size(GripperStepper::RaspberrySize raspberry_size);
 
-        static bool deserialize_raspberry_size(String raspberry_size_str, GrabberStepper::RaspberrySize* out_raspberry_size);
+        static bool deserialize_raspberry_size(String raspberry_size_str, GripperStepper::RaspberrySize* out_raspberry_size);
 
 
-        enum class GrabberState {
+        enum class GripperState {
             OPEN,
             CLOSED,
         };
 
-        static const char* serialize_grabber_state(GrabberStepper::GrabberState grabber_state);
+        static const char* serialize_gripper_state(GripperStepper::GripperState gripper_state);
 
-        static bool deserialize_grabber_state(String grabber_state_str, GrabberStepper::GrabberState* out_grabber_state);
+        static bool deserialize_gripper_state(String gripper_state_str, GripperStepper::GripperState* out_gripper_state);
 
 
         static const int steps_per_revolution; // amount of steps per revolution
