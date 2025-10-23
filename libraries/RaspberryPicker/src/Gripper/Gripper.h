@@ -16,18 +16,8 @@ typedef struct {
     int stepper_motor_pins[4];
 } GripperPinout;
 
-enum RaspberrySize{
-    LARGE,
-    SMALL
-};
 
-static const char* raspberry_size_strings[] = {
-    "LARGE",
-    "SMALL"
-};
 
-const char* raspberry_size_to_str(RaspberrySize raspberry_size);
-bool str_to_raspberry_size(String raspberry_size_str, RaspberrySize* out_raspberry_size);
 
 class GripperController{
     public:
@@ -47,7 +37,7 @@ class GripperController{
          *          evaluates the size of the berry we are touching and returns
          *          the more likely size.
          */
-        RaspberrySize set_grabber(GrabberState desired_grabber_state);
+        GrabberStepper::RaspberrySize set_grabber(GrabberStepper::GrabberState desired_grabber_state);
 
         /**
          * returns true if the color sensor thinks the berry is ripe.
@@ -61,7 +51,7 @@ class GripperController{
         ~GripperController() {
             delete plate_stepper;  // prevent memory leak
         }
-        GrabberState grabber_state;
+        GrabberStepper::GrabberState grabber_state;
         float plate_distance;
         Stepper *plate_stepper;
         InterfaceMaster *interface;

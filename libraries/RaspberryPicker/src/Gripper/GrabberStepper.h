@@ -5,23 +5,40 @@
 #define PI 3.141592653589793
 #endif
 
-enum class GrabberState {
-    OPEN,
-    CLOSED,
-};
-
 static const char* grabber_state_strings[2] = {
     "OPEN",
     "CLOSED"
 };
 
-const char* grabber_state_to_str(GrabberState grabber_state);
-bool str_to_grabber_state(String grabber_state_str, GrabberState* out_grabber_state);
+static const char* raspberry_size_strings[] = {
+    "LARGE",
+    "SMALL"
+};
 
-
-class GrabberStepperMotorValues
+class GrabberStepper
 {
+
     public:
+        enum RaspberrySize{
+            LARGE,
+            SMALL
+        };
+
+        static const char* serialize_raspberry_size(GrabberStepper::RaspberrySize raspberry_size);
+
+        static bool deserialize_raspberry_size(String raspberry_size_str, GrabberStepper::RaspberrySize* out_raspberry_size);
+
+
+        enum class GrabberState {
+            OPEN,
+            CLOSED,
+        };
+
+        static const char* serialize_grabber_state(GrabberStepper::GrabberState grabber_state);
+
+        static bool deserialize_grabber_state(String grabber_state_str, GrabberStepper::GrabberState* out_grabber_state);
+
+
         static const int steps_per_revolution; // amount of steps per revolution
         static const int speed;                // speed (RPM) to use while driving
         static const float transmission_ratio; // how many mm does the plate move per rotation? [mm/rot] module * Z * pi

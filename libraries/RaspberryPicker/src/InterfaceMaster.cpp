@@ -37,9 +37,9 @@ void InterfaceMaster::listen_state_change_requests(){
                     this->basket_controller->set_sorting(new_sorting_state);
                 }
             }else if (key == "gripper.grabber_state"){
-                GrabberState new_grabber_state;
+                GrabberStepper::GrabberState new_grabber_state;
                 this->controller->set_state(Controller::State::MANUAL);
-                if (this->gripper_controller && str_to_grabber_state(value, &new_grabber_state)){
+                if (this->gripper_controller && GrabberStepper::deserialize_grabber_state(value, &new_grabber_state)){
                     this->gripper_controller->set_grabber(new_grabber_state);
                 }
             }else if (key == "controller.program"){

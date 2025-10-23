@@ -17,12 +17,12 @@ const int ColorSensor::delay_probe = 10;
 const int ColorSensor::delay_color = 100;
 const int ColorSensor::delay_calibrate = 2000;
 
-const float GrabberStepperMotorValues::transmission_ratio = 1.5 * 18 * PI;
-const int GrabberStepperMotorValues::measuring_interval = 1;
-const int GrabberStepperMotorValues::plate_distance = 90;
-const int GrabberStepperMotorValues::plate_distance_min = 5;
-const int GrabberStepperMotorValues::steps_per_revolution = 300;
-const int GrabberStepperMotorValues::speed = 300;
+const float GrabberStepper::transmission_ratio = 1.5 * 18 * PI;
+const int GrabberStepper::measuring_interval = 1;
+const int GrabberStepper::plate_distance = 90;
+const int GrabberStepper::plate_distance_min = 5;
+const int GrabberStepper::steps_per_revolution = 300;
+const int GrabberStepper::speed = 300;
 const float PressureSensor::berry_size_small_standard_deviation = 0;
 const float PressureSensor::berry_size_small_mean = 0;
 const float PressureSensor::berry_size_large_standard_deviation = 0;
@@ -31,60 +31,44 @@ const int PressureSensor::pressure_sensor_thresholds[2] = {1023,1023};
 
 GripperController::GripperController(GripperPinout *pinout, InterfaceMaster *interface){
     this->interface = interface;
-    this->grabber_state = GrabberState::OPEN;
+    this->grabber_state = GrabberStepper::GrabberState::OPEN;
     this->color_sensor = new ColorSensor(pinout->color_sensor_pinout);
     this->pressure_sensor = new PressureSensor(pinout->pressure_sensor_pins);
-    this->plate_distance = GrabberStepperMotorValues::plate_distance;
+    this->plate_distance = GrabberStepper::plate_distance;
     this->plate_stepper = new Stepper(
-        GrabberStepperMotorValues::steps_per_revolution,
+        GrabberStepper::steps_per_revolution,
         pinout->stepper_motor_pins[0],
         pinout->stepper_motor_pins[1],
         pinout->stepper_motor_pins[2],
         pinout->stepper_motor_pins[3]
     );
 
-    this->plate_stepper->setSpeed(GrabberStepperMotorValues::speed);
-}
-
-const char* raspberry_size_to_str(RaspberrySize raspberry_size){
-    int idx = (int)raspberry_size;
-    return raspberry_size_strings[idx];
-}
-
-bool str_to_raspberry_size(String raspberry_size_str, RaspberrySize* out_raspberry_size){
-    bool matched = true;
-    if (raspberry_size_str=="LARGE"){
-        *out_raspberry_size = RaspberrySize::LARGE;
-    }else if (raspberry_size_str=="SMALL"){
-        *out_raspberry_size = RaspberrySize::SMALL;
-    }else{
-        matched = false;
-    }
-    return matched;
+    this->plate_stepper->setSpeed(GrabberStepper::speed);
 }
 
 
-RaspberrySize GripperController::set_grabber(GrabberState desired_grabber_state){
+
+GrabberStepper::RaspberrySize GripperController::set_grabber(GrabberStepper::GrabberState desired_grabber_state){
     // [stp] = [mm]/([mm/rot]*[rot/stp])
     int steps_per_interval =
-        GrabberStepperMotorValues::measuring_interval / (   // [mm]
-            GrabberStepperMotorValues::transmission_ratio * // [mm/rot]
-            GrabberStepperMotorValues::steps_per_revolution // [stp/rot]
+        GrabberStepper::measuring_interval / (   // [mm]
+            GrabberStepper::transmission_ratio * // [mm/rot]
+            GrabberStepper::steps_per_revolution // [stp/rot]
         );
 
     // [ms/stp] = 3600[ms/min]/([stp/rot]*[rot/min])
     int ms_per_step =
         3600 / (
-            GrabberStepperMotorValues::speed *              // [rot/min]
-            GrabberStepperMotorValues::steps_per_revolution // [stp/rot]
+            GrabberStepper::speed *              // [rot/min]
+            GrabberStepper::steps_per_revolution // [stp/rot]
         );
 
     switch (desired_grabber_state){
-        case GrabberState::OPEN:
+        case GrabberStepper::GrabberState::OPEN:
             {
                 int steps_til_open =
-                    GrabberStepperMotorValues::steps_per_revolution /
-                    GrabberStepperMotorValues::transmission_ratio * (this->plate_distance - GrabberStepperMotorValues::plate_distance);
+                    GrabberStepper::steps_per_revolution /
+                    GrabberStepper::transmission_ratio * (this->plate_distance - GrabberStepper::plate_distance);
                 Serial.println((String)+"Steps until open: " + steps_til_open);
 
                 this->plate_stepper->step(steps_til_open);
@@ -93,36 +77,36 @@ RaspberrySize GripperController::set_grabber(GrabberState desired_grabber_state)
 
                 this->plate_distance = this->plate_distance -
                     steps_til_open *  // [stp]
-                    GrabberStepperMotorValues::transmission_ratio /     // [mm/rot]
-                    GrabberStepperMotorValues::steps_per_revolution;    // [rot/stp]
+                    GrabberStepper::transmission_ratio /     // [mm/rot]
+                    GrabberStepper::steps_per_revolution;    // [rot/stp]
 
-                this->grabber_state = GrabberState::OPEN;
-                this->interface->send_state("gripper.grabber_state", grabber_state_to_str(this->grabber_state));
+                this->grabber_state = GrabberStepper::GrabberState::OPEN;
+                this->interface->send_state("gripper.grabber_state", GrabberStepper::serialize_grabber_state(this->grabber_state));
                 this->interface->send_state("gripper.plate_distance", this->plate_distance);
             }
             break;
-        case GrabberState::CLOSED:
+        case GrabberStepper::GrabberState::CLOSED:
             {
                 // close until the plates get touch feedback
                 int steps = 0;
-                while(!this->pressure_sensor->is_touching() && this->plate_distance >= GrabberStepperMotorValues::plate_distance_min){
+                while(!this->pressure_sensor->is_touching() && this->plate_distance >= GrabberStepper::plate_distance_min){
 
                     this->plate_stepper->step(steps_per_interval);
 
                     steps++;
 
                     // [mm] = [stp] * [mm/rot] / [stp/rot]
-                    this->plate_distance = GrabberStepperMotorValues::plate_distance -
+                    this->plate_distance = GrabberStepper::plate_distance -
                         steps *  // [stp]
-                        GrabberStepperMotorValues::transmission_ratio /     // [mm/rot]
-                        GrabberStepperMotorValues::steps_per_revolution;    // [rot/stp]
+                        GrabberStepper::transmission_ratio /     // [mm/rot]
+                        GrabberStepper::steps_per_revolution;    // [rot/stp]
                     this->interface->send_state("gripper.plate_distance", this->plate_distance);
 
                     delay(abs(ms_per_step * steps_per_interval));
                 }
 
-                this->grabber_state = GrabberState::CLOSED;
-                this->interface->send_state("gripper.grabber_state", grabber_state_to_str(this->grabber_state));
+                this->grabber_state = GrabberStepper::GrabberState::CLOSED;
+                this->interface->send_state("gripper.grabber_state", GrabberStepper::serialize_grabber_state(this->grabber_state));
 
                 float raspberry_width = this->plate_distance;
 
@@ -147,9 +131,9 @@ RaspberrySize GripperController::set_grabber(GrabberState desired_grabber_state)
                 this->interface->send_state("gripper.berry_p_small", probability_small);
 
                 if (probability_large>probability_small){
-                    return RaspberrySize::LARGE;
+                    return GrabberStepper::RaspberrySize::LARGE;
                 }else{
-                    return RaspberrySize::SMALL;
+                    return GrabberStepper::RaspberrySize::SMALL;
                 }
             }
             break;
