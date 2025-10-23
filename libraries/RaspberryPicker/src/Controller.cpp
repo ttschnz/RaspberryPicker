@@ -72,10 +72,10 @@ void Controller::run_close(){
     // set sorting to the correct position
     switch(size){
         case RaspberrySize::LARGE:
-            this->basket_controller->set_sorting(SortingState::LARGE);
+            this->basket_controller->set_sorting(BasketSorter::SortingState::LARGE);
             break;
         case RaspberrySize::SMALL:
-            this->basket_controller->set_sorting(SortingState::SMALL);
+            this->basket_controller->set_sorting(BasketSorter::SortingState::SMALL);
             break;
     }
 }
@@ -83,7 +83,7 @@ void Controller::run_close(){
 void Controller::run_release(){
     this->gripper_controller->set_grabber(GrabberState::OPEN);
     if (this->basket_controller->increment_counter()==false){
-        Serial.println((String)"cannot increment counter on sorting state " + sorting_state_to_str(this->basket_controller->sorting_state));
+        Serial.println((String)"cannot increment counter on sorting state " + BasketSorter::serialize_sorting_state(this->basket_controller->sorting_state));
     }
 }
 
@@ -104,7 +104,7 @@ void Controller::run_drop(){
 void Controller::run_reset(){
     this->gripper_controller->set_grabber(GrabberState::OPEN);
     this->basket_controller->set_door(BasketDoor::DoorState::CLOSED);
-    this->basket_controller->set_sorting(SortingState::IDLE);
+    this->basket_controller->set_sorting(BasketSorter::SortingState::IDLE);
     this->basket_controller->reset_counter(true);
 }
 

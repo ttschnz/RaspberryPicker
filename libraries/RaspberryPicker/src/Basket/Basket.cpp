@@ -7,10 +7,10 @@
 #include "Door.h"
 #include "Sorting.h"
 
-const int SortingServoValues::small_pos = 0;
-const int SortingServoValues::idle_pos = 90;
-const int SortingServoValues::large_pos = 180;
-const int SortingServoValues::speed = 500;
+const int BasketSorter::small_pos = 0;
+const int BasketSorter::idle_pos = 90;
+const int BasketSorter::large_pos = 180;
+const int BasketSorter::speed = 500;
 
 const int BasketDoor::open_small_pos = 0;
 const int BasketDoor::closed_pos = 90;
@@ -33,7 +33,7 @@ BasketController::BasketController(BasketPinout *pinout,InterfaceMaster *interfa
     pinMode(pinout->sorting_pin, OUTPUT);
 
     // Initialize position variables
-    this->set_sorting(SortingState::IDLE);
+    this->set_sorting(BasketSorter::SortingState::IDLE);
     this->set_door(BasketDoor::DoorState::CLOSED);
 }
 
@@ -83,29 +83,29 @@ bool BasketController::reset_counter(bool force){
     return reset_large || reset_small;
 }
 
-int BasketController::get_desired_sorting_pos(SortingState new_sorting_state){
+int BasketController::get_desired_sorting_pos(BasketSorter::SortingState new_sorting_state){
     int desired_pos;
 
     switch (new_sorting_state){
-        case SortingState::IDLE:
-            desired_pos = SortingServoValues::idle_pos;
+        case BasketSorter::SortingState::IDLE:
+            desired_pos = BasketSorter::idle_pos;
             break;
-        case SortingState::SMALL:
-            desired_pos = SortingServoValues::small_pos;
+        case BasketSorter::SortingState::SMALL:
+            desired_pos = BasketSorter::small_pos;
             break;
-        case SortingState::LARGE:
-            desired_pos = SortingServoValues::large_pos;
+        case BasketSorter::SortingState::LARGE:
+            desired_pos = BasketSorter::large_pos;
             break;
     };
     return desired_pos;
 }
 
-void BasketController::set_sorting(SortingState target_state){
+void BasketController::set_sorting(BasketSorter::SortingState target_state){
     int target_position = this->get_desired_sorting_pos(target_state);
     int angular_distance = abs(this->door_servo.read() - target_position);  // angular distance in degrees
-    int time_to_reach = (angular_distance * 1000) / SortingServoValues::speed; // [deg]/[deg/s]*[1000ms/s]=[ms]
+    int time_to_reach = (angular_distance * 1000) / BasketSorter::speed; // [deg]/[deg/s]*[1000ms/s]=[ms]
     this->sorting_state = target_state;
-    this->interface->send_state("basket.sorting.state", sorting_state_to_str(target_state));
+    this->interface->send_state("basket.sorting.state", BasketSorter::serialize_sorting_state(target_state));
     this->sorting_servo.write(target_position);
     this->interface->send_state("basket.sorting.position", target_position);
     delay(time_to_reach);
@@ -113,14 +113,14 @@ void BasketController::set_sorting(SortingState target_state){
 
 bool BasketController::increment_counter(){
     switch (this->sorting_state) {
-        case SortingState::IDLE:
+        case BasketSorter::SortingState::IDLE:
             return false;
             break;
-        case SortingState::SMALL:
+        case BasketSorter::SortingState::SMALL:
             this->fill_count.fill_small += 1;
             this->interface->send_state("basket.fill_count.small", this->fill_count.fill_small);
             break;
-        case SortingState::LARGE:
+        case BasketSorter::SortingState::LARGE:
             this->fill_count.fill_large += 1;
             this->interface->send_state("basket.fill_count.large", this->fill_count.fill_large);
             break;

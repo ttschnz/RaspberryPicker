@@ -56,12 +56,12 @@ class BasketController {
         /**
          * * Gets the angle to be sent to the sorting servo motor based on the desired state.
          */
-        int get_desired_sorting_pos(SortingState desired_sorting_state);
+        int get_desired_sorting_pos(BasketSorter::SortingState desired_sorting_state);
 
         /**
          * Sets the sorting to a certain position
          */
-        void set_sorting(SortingState target_state);
+        void set_sorting(BasketSorter::SortingState target_state);
 
         /**
          * increments the counter by one for the current sorting state. returns false if we are idle
@@ -69,7 +69,7 @@ class BasketController {
         bool increment_counter();
 
         FillCount fill_count;
-        SortingState sorting_state;
+        BasketSorter::SortingState sorting_state;
     private:
         Servo sorting_servo;
         Servo door_servo;
