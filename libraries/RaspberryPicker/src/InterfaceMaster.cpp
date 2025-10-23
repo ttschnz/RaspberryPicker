@@ -25,9 +25,9 @@ void InterfaceMaster::listen_state_change_requests(){
             String key = line.substring(0, delimiterPos);
             String value = line.substring(delimiterPos + 1);
             if (key == "basket.door.state"){
-                DoorState new_door_state;
+                BasketDoor::DoorState new_door_state;
                 this->controller->set_state(Controller::State::MANUAL);
-                if (this->basket_controller && str_to_door_state(value, &new_door_state)){
+                if (this->basket_controller && BasketDoor::deserialize_door_state(value, &new_door_state)){
                     this->basket_controller->set_door(new_door_state);
                 }
             }else if (key == "basket.sorting.state"){

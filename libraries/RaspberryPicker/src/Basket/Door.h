@@ -1,17 +1,7 @@
 #ifndef RASPBERRY_PICKER_BASKET_DOOR_H
 #define RASPBERRY_PICKER_BASKET_DOOR_H
 
-/**
- * Door State:
- * - OPEN_LARGE: The door for large berries is open
- * - OPEN_SMALL: The door for small berries is open
- * - CLOSED: The door is closed
- */
-enum class DoorState {
-     OPEN_SMALL,
-     OPEN_LARGE,
-     CLOSED,
- };
+
 
 static const char* door_state_strings[] = {
     "OPEN_SMALL",
@@ -19,12 +9,25 @@ static const char* door_state_strings[] = {
     "CLOSED"
 };
 
-const char* door_state_to_str(DoorState door_state);
-bool str_to_door_state(String door_state_str, DoorState* out_door_state);
 
-class DoorValues
+class BasketDoor
 {
     public:
+        /**
+        * Door State:
+        * - OPEN_LARGE: The door for large berries is open
+        * - OPEN_SMALL: The door for small berries is open
+        * - CLOSED: The door is closed
+        */
+        enum class DoorState {
+            OPEN_SMALL,
+            OPEN_LARGE,
+            CLOSED,
+        };
+
+        static const char* serialize_door_state(BasketDoor::DoorState door_state);
+        static bool deserialize_door_state(String door_state_str, BasketDoor::DoorState* out_door_state);
+
         static const int closed_pos;        // position at which the both containers are closed  [deg]
         static const int open_large_pos;    // position at which the large berry container is open [deg]
         static const int open_small_pos;    // position at which the small berry container is open [deg]

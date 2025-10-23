@@ -40,12 +40,12 @@ class BasketController {
         /**
          * Gets the angle to be sent to the door servo motor based on the desired state.
          */
-        int get_desired_door_pos(DoorState desired_door_state);
+        int get_desired_door_pos(BasketDoor::DoorState desired_door_state);
 
         /**
          * opens or closes the basket's door synchronously (wait until done).
          */
-        void set_door(DoorState target_state);
+        void set_door(BasketDoor::DoorState target_state);
 
         /**
          * resets the counter for the currently open door.
@@ -75,7 +75,7 @@ class BasketController {
         Servo door_servo;
         int sorting_pos;
         int door_pos;
-        DoorState door_state;
+        BasketDoor::DoorState door_state;
         InterfaceMaster *interface;
 } ;
 #endif

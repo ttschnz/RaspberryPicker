@@ -12,11 +12,11 @@ const int SortingServoValues::idle_pos = 90;
 const int SortingServoValues::large_pos = 180;
 const int SortingServoValues::speed = 500;
 
-const int DoorValues::open_small_pos = 0;
-const int DoorValues::closed_pos = 90;
-const int DoorValues::open_large_pos = 180;
-const int DoorValues::speed = 300;
-const int DoorValues::max_fill = 23;
+const int BasketDoor::open_small_pos = 0;
+const int BasketDoor::closed_pos = 90;
+const int BasketDoor::open_large_pos = 180;
+const int BasketDoor::speed = 300;
+const int BasketDoor::max_fill = 23;
 
 BasketController::BasketController(BasketPinout *pinout,InterfaceMaster *interface){
     this->interface = interface;
@@ -34,41 +34,41 @@ BasketController::BasketController(BasketPinout *pinout,InterfaceMaster *interfa
 
     // Initialize position variables
     this->set_sorting(SortingState::IDLE);
-    this->set_door(DoorState::CLOSED);
+    this->set_door(BasketDoor::DoorState::CLOSED);
 }
 
-int BasketController::get_desired_door_pos(DoorState new_door_state){
+int BasketController::get_desired_door_pos(BasketDoor::DoorState new_door_state){
     int desired_pos;
 
     switch (new_door_state){
-        case DoorState::CLOSED:
-            desired_pos = DoorValues::closed_pos;
+        case BasketDoor::DoorState::CLOSED:
+            desired_pos = BasketDoor::closed_pos;
             break;
-        case DoorState::OPEN_SMALL:
-            desired_pos = DoorValues::open_small_pos;
+        case BasketDoor::DoorState::OPEN_SMALL:
+            desired_pos = BasketDoor::open_small_pos;
             break;
-        case DoorState::OPEN_LARGE:
-            desired_pos = DoorValues::open_large_pos;
+        case BasketDoor::DoorState::OPEN_LARGE:
+            desired_pos = BasketDoor::open_large_pos;
             break;
     };
     Serial.println((String)"desired door pos: " + desired_pos);
     return desired_pos;
 }
 
-void BasketController::set_door(DoorState target_state){
+void BasketController::set_door(BasketDoor::DoorState target_state){
     int target_position = this->get_desired_door_pos(target_state);
     int angular_distance = abs(this->door_servo.read() - target_position);  // angular distance in degrees
-    int time_to_reach = (angular_distance * 1000) / DoorValues::speed; // [deg]/[deg/s]*[1000ms/s]=[ms]
+    int time_to_reach = (angular_distance * 1000) / BasketDoor::speed; // [deg]/[deg/s]*[1000ms/s]=[ms]
     this->door_state = target_state;
     this->door_servo.write(target_position);
-    this->interface->send_state("basket.door.state", door_state_to_str(target_state));
+    this->interface->send_state("basket.door.state", BasketDoor::serialize_door_state(target_state));
     delay(time_to_reach);
     this->interface->send_state("basket.door.position", target_position);
 }
 
 bool BasketController::reset_counter(bool force){
-    bool reset_large = (this->door_state == DoorState::OPEN_LARGE) || force;
-    bool reset_small = (this->door_state == DoorState::OPEN_SMALL) || force;
+    bool reset_large = (this->door_state == BasketDoor::DoorState::OPEN_LARGE) || force;
+    bool reset_small = (this->door_state == BasketDoor::DoorState::OPEN_SMALL) || force;
 
     if (reset_small){
             this->fill_count.fill_small = 0;
