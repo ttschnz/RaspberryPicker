@@ -9,12 +9,12 @@ PressureSensor::PressureSensor(int pinout[2]){
     pinMode(this->pinout[1], INPUT);
 }
 
-const char* PressureSensor::pressure_state_to_str(PressureSensor::PressureState pressure_state){
+const char* PressureSensor::serialize_pressure_state(PressureSensor::PressureState pressure_state){
     int idx = (int)pressure_state;
     return pressure_state_strings[idx];
 };
 
-bool PressureSensor::str_to_pressure_state(String pressure_state_str, PressureSensor::PressureState* out_pressure_state){
+bool PressureSensor::deserialize_pressure_state(String pressure_state_str, PressureSensor::PressureState* out_pressure_state){
     bool matched = true;
     if (pressure_state_str == "TOUCHING") {
         *out_pressure_state = PressureSensor::PressureState::TOUCHING;

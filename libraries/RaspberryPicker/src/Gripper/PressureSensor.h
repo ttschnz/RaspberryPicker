@@ -25,12 +25,12 @@ class PressureSensor{
         /**
          * turns the state (enum) to a string
          */
-        static const char* pressure_state_to_str(PressureState pressure_state);
+        static const char* serialize_pressure_state(PressureState pressure_state);
 
         /**
          * Parses the state (string) to an instance of its enum. returns false if there is no match.
          */
-        static bool str_to_pressure_state(String pressure_state_str, PressureState* out_pressure_state);
+        static bool deserialize_pressure_state(String pressure_state_str, PressureState* out_pressure_state);
 
         /**
          * returns true if the pressure sensor's reading is high enough
