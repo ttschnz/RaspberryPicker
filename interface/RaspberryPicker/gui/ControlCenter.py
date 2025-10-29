@@ -8,7 +8,7 @@ class ControlCenter(ctk.CTk):
     controller_states = ("MANUAL", "IDLE", "PROGRAM")
     controller_programs = ("CLOSE", "RELEASE", "DROP", "RESET", "CALIBRATE_COLOR")
     sorting_states = ("LARGE", "SMALL", "IDLE")
-    door_states = ("OPEN_SMALL", "OPEN_LARGE", "CLOSED")
+    door_states = ("OPEN", "CLOSED")
     gripper_states = ("OPEN", "CLOSED")
 
     def __init__(self, *args, **kwargs):

@@ -88,17 +88,9 @@ void Controller::run_release(){
 }
 
 void Controller::run_drop(){
-    FillCount fill_count = this->basket_controller->fill_count;
-    if (fill_count.fill_large >= BasketDoor::max_fill){
-        this->basket_controller->set_door(BasketDoor::DoorState::OPEN_LARGE);
-        this->basket_controller->reset_counter(false);
-        this->basket_controller->set_door(BasketDoor::DoorState::CLOSED);
-    }
-    if (fill_count.fill_small >= BasketDoor::max_fill){
-        this->basket_controller->set_door(BasketDoor::DoorState::OPEN_SMALL);
-        this->basket_controller->reset_counter(false);
-        this->basket_controller->set_door(BasketDoor::DoorState::CLOSED);
-    }
+    this->basket_controller->set_door(BasketDoor::DoorState::OPEN);
+    this->basket_controller->reset_counter(false);
+    this->basket_controller->set_door(BasketDoor::DoorState::CLOSED);
 }
 
 void Controller::run_reset(){
