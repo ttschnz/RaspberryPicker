@@ -7,15 +7,12 @@
 #include "Door.h"
 #include "Sorting.h"
 
-const int BasketSorter::small_pos = 0;
-const int BasketSorter::idle_pos = 90;
-const int BasketSorter::large_pos = 180;
-const int BasketSorter::speed = 500;
+const int BasketSorter::small_pos = 20;
+const int BasketSorter::idle_pos = 86;
+const int BasketSorter::large_pos = 152;
 
-const int BasketDoor::open_small_pos = 0;
-const int BasketDoor::closed_pos = 90;
-const int BasketDoor::open_large_pos = 180;
-const int BasketDoor::speed = 300;
+const int BasketDoor::closed_pos = 170;
+const int BasketDoor::open_pos = 10;
 const int BasketDoor::max_fill = 23;
 
 BasketController::BasketController(BasketPinout *pinout,InterfaceMaster *interface){
