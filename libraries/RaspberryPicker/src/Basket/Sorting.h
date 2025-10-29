@@ -26,7 +26,6 @@ class BasketSorter
         static const int large_pos;
         static const int small_pos;
         static const int idle_pos;
-        static const int speed;
 
         static const char* serialize_sorting_state(BasketSorter::SortingState sorting_state);
         static bool deserialize_sorting_state(String sorting_state_str, BasketSorter::SortingState* out_sorting_state);

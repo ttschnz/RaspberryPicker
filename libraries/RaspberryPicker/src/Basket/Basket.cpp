@@ -54,12 +54,9 @@ int BasketController::get_desired_door_pos(BasketDoor::DoorState new_door_state)
 
 void BasketController::set_door(BasketDoor::DoorState target_state){
     int target_position = this->get_desired_door_pos(target_state);
-    int angular_distance = abs(this->door_servo.read() - target_position);  // angular distance in degrees
-    int time_to_reach = (angular_distance * 1000) / BasketDoor::speed; // [deg]/[deg/s]*[1000ms/s]=[ms]
     this->door_state = target_state;
     this->door_servo.write(target_position);
     this->interface->send_state("basket.door.state", BasketDoor::serialize_door_state(target_state));
-    delay(time_to_reach);
     this->interface->send_state("basket.door.position", target_position);
 }
 
@@ -95,13 +92,10 @@ int BasketController::get_desired_sorting_pos(BasketSorter::SortingState new_sor
 
 void BasketController::set_sorting(BasketSorter::SortingState target_state){
     int target_position = this->get_desired_sorting_pos(target_state);
-    int angular_distance = abs(this->door_servo.read() - target_position);  // angular distance in degrees
-    int time_to_reach = (angular_distance * 1000) / BasketSorter::speed; // [deg]/[deg/s]*[1000ms/s]=[ms]
     this->sorting_state = target_state;
     this->interface->send_state("basket.sorting.state", BasketSorter::serialize_sorting_state(target_state));
     this->sorting_servo.write(target_position);
     this->interface->send_state("basket.sorting.position", target_position);
-    delay(time_to_reach);
 }
 
 bool BasketController::increment_counter(){
