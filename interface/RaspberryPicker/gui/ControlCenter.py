@@ -102,12 +102,6 @@ class ControlCenter(ctk.CTk):
         ctk.CTkLabel(self.gripper_frame, text="Size").grid(column=0, row=1, sticky="w", **paddings)
         ctk.CTkEntry(self.gripper_frame, textvariable=self.state_manager.values["gripper.raspberry_size"], state="disabled", width=80).grid(column=1, row=1, **paddings)
 
-        ctk.CTkLabel(self.gripper_frame, text="p_s").grid(column=2, row=1, sticky="w", **paddings)
-        ctk.CTkEntry(self.gripper_frame, textvariable=self.state_manager.values["gripper.berry_p_small"], state="disabled", width=50).grid(column=3, row=1, **paddings)
-
-        ctk.CTkLabel(self.gripper_frame, text="p_l").grid(column=4, row=1, sticky="w", **paddings)
-        ctk.CTkEntry(self.gripper_frame, textvariable=self.state_manager.values["gripper.berry_p_large"], state="disabled", width=50).grid(column=5, row=1, **paddings)
-
         ctk.CTkLabel(self.gripper_frame, text="Ripeness").grid(column=0, row=2, sticky="w", **paddings)
         ctk.CTkEntry(self.gripper_frame, textvariable=self.state_manager.values["gripper.raspberry_ripeness"], state="disabled", width=80).grid(column=1, row=2, **paddings)
 
