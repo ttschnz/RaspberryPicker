@@ -65,7 +65,7 @@ void Controller::run_close(){
     }
 
     // close grabbing mechanism
-    GripperStepper::RaspberrySize size = this->gripper_controller->set_gripper(GripperStepper::GripperState::CLOSED);
+    GripperStepper::RaspberrySize size = this->gripper_controller->set_gripper(GripperStepper::GripperState::CLOSED_SMALL);
     this->interface->send_state("gripper.raspberry_size", GripperStepper::serialize_raspberry_size(size));
 
 

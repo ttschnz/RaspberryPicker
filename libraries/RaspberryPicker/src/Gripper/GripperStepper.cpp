@@ -10,7 +10,7 @@ const char* GripperStepper::serialize_gripper_state(GripperStepper::GripperState
 bool GripperStepper::deserialize_gripper_state(String gripper_state_str, GripperStepper::GripperState* out_gripper_state){
     bool matched = true;
     if (gripper_state_str=="CLOSED"){
-        *out_gripper_state = GripperStepper::GripperState::CLOSED;
+        *out_gripper_state = GripperStepper::GripperState::CLOSED_SMALL;
     }else if (gripper_state_str=="OPEN"){
         *out_gripper_state = GripperStepper::GripperState::OPEN;
     }else{
@@ -20,6 +20,41 @@ bool GripperStepper::deserialize_gripper_state(String gripper_state_str, Gripper
 
 }
 
+int GripperStepper::mm_to_steps(int mm){
+    int steps =
+        mm   // [mm]
+        * GripperStepper::steps_per_revolution // [stp/rot]
+        / GripperStepper::transmission_ratio; // [mm/rot]
+    return steps;
+}
+
+
+int GripperStepper::steps_to_mm(int steps){
+    int mm =
+        steps   // [mm]
+        * GripperStepper::transmission_ratio // [mm/rot]
+        / GripperStepper::steps_per_revolution; // [stp/rot]
+    return mm;
+}
+
+int GripperStepper::get_desired_step_position(GripperState state){
+    int desired_mm = 0;
+    switch(state){
+        case GripperStepper::GripperState::OPEN:
+            desired_mm = GripperStepper::plate_distance_open;
+            break;
+        case GripperStepper::GripperState::CLOSED_SMALL:
+            desired_mm = GripperStepper::plate_distance_small;
+            break;
+        case GripperStepper::GripperState::CLOSED_LARGE:
+            desired_mm = GripperStepper::plate_distance_large;
+            break;
+    }
+
+    int desired_steps = GripperStepper::mm_to_steps(desired_mm);
+
+    return desired_steps;
+}
 
 const char* GripperStepper::serialize_raspberry_size(GripperStepper::RaspberrySize raspberry_size){
     int idx = (int)raspberry_size;

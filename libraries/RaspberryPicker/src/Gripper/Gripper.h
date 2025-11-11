@@ -1,7 +1,7 @@
 #ifndef RASPBERRY_PICKER_GRIPPER_H
 #define RASPBERRY_PICKER_GRIPPER_H
 
-#include <Stepper.h>
+#include <AccelStepper.h>
 
 #include "../InterfaceMaster.h"
 #include "../Basket/Basket.h"
@@ -53,7 +53,7 @@ class GripperController{
         }
         GripperStepper::GripperState gripper_state;
         float plate_distance;
-        Stepper *plate_stepper;
+        AccelStepper *plate_stepper;
         InterfaceMaster *interface;
         PressureSensor *pressure_sensor;
 };

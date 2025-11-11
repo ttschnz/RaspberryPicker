@@ -31,20 +31,27 @@ class GripperStepper
 
         enum class GripperState {
             OPEN,
-            CLOSED,
+            CLOSED_SMALL,
+            CLOSED_LARGE,
         };
 
         static const char* serialize_gripper_state(GripperStepper::GripperState gripper_state);
 
         static bool deserialize_gripper_state(String gripper_state_str, GripperStepper::GripperState* out_gripper_state);
 
+        static int get_desired_step_position(GripperState state);
+        static int mm_to_steps(int mm);
+        static int steps_to_mm(int steps);
 
         static const int steps_per_revolution; // amount of steps per revolution
-        static const int speed;                // speed (RPM) to use while driving
+        static const int speed;                // speed (RPM) to use while run
+        static const int max_speed;            // max speed (RPM) to use while moveTo
+        static const int acceleration;         // acceleration to use while moveTo: keep around 300 to maintain control
         static const float transmission_ratio; // how many mm does the plate move per rotation? [mm/rot] module * Z * pi
-        static const int plate_distance;       // how many mm do we want the plates to be apart from each other in the open state?
+        static const int plate_distance_open;  // how many mm do we want the plates to be apart from each other in the open state?
+        static const int plate_distance_large; // how many mm are the plates apart from each other for a large berry?
+        static const int plate_distance_small; // how many mm are the plates apart from each other for a small berry?
         static const int plate_distance_min;   // what is the minimal distance we should keep between plates? [mm]
-        static const int measuring_interval;   // how many mm do we move until we check if we have pressure?
 };
 
 #endif

@@ -1,4 +1,4 @@
-#include <Stepper.h>
+#include <AccelStepper.h>
 #include <Arduino.h>
 
 #include "../Math/gaussian_pdf.h"
@@ -18,11 +18,14 @@ const int ColorSensor::delay_color = 100;
 const int ColorSensor::delay_calibrate = 2000;
 
 const float GripperStepper::transmission_ratio = 1.5 * 18 * PI;
-const int GripperStepper::measuring_interval = 1;
-const int GripperStepper::plate_distance = 90;
+const int GripperStepper::plate_distance_open = 90;
+const int GripperStepper::plate_distance_large = 30;
+const int GripperStepper::plate_distance_small = 20;
 const int GripperStepper::plate_distance_min = 5;
-const int GripperStepper::steps_per_revolution = 300;
-const int GripperStepper::speed = 300;
+const int GripperStepper::steps_per_revolution = 2048;
+const int GripperStepper::speed = 200;
+const int GripperStepper::max_speed = 1200;
+const int GripperStepper::acceleration = 300;
 const float PressureSensor::berry_size_small_standard_deviation = 0;
 const float PressureSensor::berry_size_small_mean = 0;
 const float PressureSensor::berry_size_large_standard_deviation = 0;
@@ -34,46 +37,38 @@ GripperController::GripperController(GripperPinout *pinout, InterfaceMaster *int
     this->gripper_state = GripperStepper::GripperState::OPEN;
     this->color_sensor = new ColorSensor(pinout->color_sensor_pinout);
     this->pressure_sensor = new PressureSensor(pinout->pressure_sensor_pins);
-    this->plate_distance = GripperStepper::plate_distance;
-    this->plate_stepper = new Stepper(
-        GripperStepper::steps_per_revolution,
+    this->plate_distance = GripperStepper::plate_distance_open;
+
+    this->plate_stepper = new AccelStepper(
+        AccelStepper::HALF4WIRE,
         pinout->stepper_motor_pins[0],
-        pinout->stepper_motor_pins[1],
         pinout->stepper_motor_pins[2],
-        pinout->stepper_motor_pins[3]
+        pinout->stepper_motor_pins[1],
+        pinout->stepper_motor_pins[4]
     );
 
+    this->plate_stepper->setCurrentPosition(
+        GripperStepper::get_desired_step_position(GripperStepper::GripperState::OPEN)
+    );
     this->plate_stepper->setSpeed(GripperStepper::speed);
+    this->plate_stepper->setMaxSpeed(GripperStepper::max_speed);
+    this->plate_stepper->setAcceleration(GripperStepper::acceleration);
+
 }
 
 
 
 GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::GripperState desired_gripper_state){
-    // [stp] = [mm]/([mm/rot]*[rot/stp])
-    int steps_per_interval =
-        GripperStepper::measuring_interval / (   // [mm]
-            GripperStepper::transmission_ratio * // [mm/rot]
-            GripperStepper::steps_per_revolution // [stp/rot]
-        );
-
-    // [ms/stp] = 3600[ms/min]/([stp/rot]*[rot/min])
-    int ms_per_step =
-        3600 / (
-            GripperStepper::speed *              // [rot/min]
-            GripperStepper::steps_per_revolution // [stp/rot]
-        );
-
     switch (desired_gripper_state){
         case GripperStepper::GripperState::OPEN:
             {
-                int steps_til_open =
-                    GripperStepper::steps_per_revolution /
-                    GripperStepper::transmission_ratio * (this->plate_distance - GripperStepper::plate_distance);
+                int target_steps = GripperStepper::get_desired_step_position(GripperStepper::GripperState::OPEN);
+                int current_steps = this->plate_stepper->currentPosition();
+
+                int steps_til_open = target_steps - current_steps;
                 Serial.println((String)+"Steps until open: " + steps_til_open);
 
-                this->plate_stepper->step(steps_til_open);
-
-                delay(abs(ms_per_step * steps_til_open));
+                this->plate_stepper->runToNewPosition(target_steps); // blocks until there
 
                 this->plate_distance = this->plate_distance -
                     steps_til_open *  // [stp]
@@ -85,56 +80,84 @@ GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::Gri
                 this->interface->send_state("gripper.plate_distance", this->plate_distance);
             }
             break;
-        case GripperStepper::GripperState::CLOSED:
+        case GripperStepper::GripperState::CLOSED_LARGE:
+        case GripperStepper::GripperState::CLOSED_SMALL:
             {
+                // for both large and small we just move until it touches. then we overwrite the desired
+                // state with what actually happened.
+
                 // close until the plates get touch feedback
-                int steps = 0;
-                while(!this->pressure_sensor->is_touching() && this->plate_distance >= GripperStepper::plate_distance_min){
+                int steps = GripperStepper::get_desired_step_position(GripperStepper::GripperState::CLOSED_SMALL);
+                this->plate_stepper->moveTo(steps);
+                bool touching = false;
 
-                    this->plate_stepper->step(steps_per_interval);
+                do{
+                    this->plate_stepper->run();
 
-                    steps++;
+                    int current_position_step = this->plate_stepper->currentPosition();
+                    int current_position_mm = GripperStepper::steps_to_mm(current_position_step);
+                    this->interface->send_state("gripper.plate_distance", current_position_mm);
 
-                    // [mm] = [stp] * [mm/rot] / [stp/rot]
-                    this->plate_distance = GripperStepper::plate_distance -
-                        steps *  // [stp]
-                        GripperStepper::transmission_ratio /     // [mm/rot]
-                        GripperStepper::steps_per_revolution;    // [rot/stp]
-                    this->interface->send_state("gripper.plate_distance", this->plate_distance);
+                    touching = this->pressure_sensor->is_touching();
 
-                    delay(abs(ms_per_step * steps_per_interval));
-                }
+                } while(!touching && this->plate_stepper->isRunning());
 
-                this->gripper_state = GripperStepper::GripperState::CLOSED;
-                this->interface->send_state("gripper.gripper_state", GripperStepper::serialize_gripper_state(this->gripper_state));
 
-                float raspberry_width = this->plate_distance;
+                GripperStepper::RaspberrySize size;
+                GripperStepper::GripperState state;
 
-                // z = (x - mean) / stdev
-                float z_large = (
-                        raspberry_width-PressureSensor::berry_size_large_mean
-                    ) / PressureSensor::berry_size_large_standard_deviation;
+                if (touching){
+                    this->plate_stepper->stop();
+                    while (this->plate_stepper->isRunning()) this->plate_stepper->run(); // decelerate cleanly
 
-                float z_small = (
-                        raspberry_width-PressureSensor::berry_size_small_mean
-                    ) / PressureSensor::berry_size_small_standard_deviation;
 
-                float p_w_given_L = gaussian_pdf(z_large);
-                float p_w_given_S = gaussian_pdf(z_small);
+                    int current_position_step = this->plate_stepper->currentPosition();
+                    int raspberry_width = GripperStepper::steps_to_mm(current_position_step);
 
-                float p_L = 0.5, p_S = 0.5;
+                    // z = (x - mean) / stdev
+                    float z_large = (
+                            raspberry_width-PressureSensor::berry_size_large_mean
+                        ) / PressureSensor::berry_size_large_standard_deviation;
 
-                float probability_large = p_w_given_L * p_L / (p_w_given_L * p_L + p_w_given_S * p_S);
-                float probability_small = p_w_given_S * p_L / (p_w_given_L * p_L + p_w_given_S * p_S);
+                    float z_small = (
+                            raspberry_width-PressureSensor::berry_size_small_mean
+                        ) / PressureSensor::berry_size_small_standard_deviation;
 
-                this->interface->send_state("gripper.berry_p_large", probability_large);
-                this->interface->send_state("gripper.berry_p_small", probability_small);
+                    float p_w_given_L = gaussian_pdf(z_large);
+                    float p_w_given_S = gaussian_pdf(z_small);
 
-                if (probability_large>probability_small){
-                    return GripperStepper::RaspberrySize::LARGE;
+                    float p_L = 0.5, p_S = 0.5;
+
+                    float probability_large = p_w_given_L * p_L / (p_w_given_L * p_L + p_w_given_S * p_S);
+                    float probability_small = p_w_given_S * p_S / (p_w_given_L * p_L + p_w_given_S * p_S);
+
+                    this->interface->send_state("gripper.berry_p_large", probability_large);
+                    this->interface->send_state("gripper.berry_p_small", probability_small);
+
+                    if (probability_large>probability_small){
+                        size = GripperStepper::RaspberrySize::LARGE;
+                        state = GripperStepper::GripperState::CLOSED_LARGE;
+                    }else{
+                        size = GripperStepper::RaspberrySize::SMALL;
+                        state = GripperStepper::GripperState::CLOSED_SMALL;
+                    }
+
                 }else{
-                    return GripperStepper::RaspberrySize::SMALL;
+                    // the stepper reached the desired position without touching a berry. this is fatal.
+                    Serial.println((String)+"FATAL ERROR: stepper closed without touching the berry.");
+
+                    // just assume that the berry is small for now
+                    state = GripperStepper::GripperState::CLOSED_SMALL;
+                    size = GripperStepper::RaspberrySize::SMALL;
                 }
+
+                this->gripper_state = state;
+                this->interface->send_state("gripper.gripper_state",
+                    GripperStepper::serialize_gripper_state(state)
+                );
+
+                return size;
+
             }
             break;
     }
