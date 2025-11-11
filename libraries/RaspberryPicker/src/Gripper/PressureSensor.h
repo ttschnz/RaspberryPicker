@@ -10,10 +10,7 @@ class PressureSensor{
     public:
         PressureSensor(int pinout[2]);
 
-        static const float berry_size_small_standard_deviation;  // Standard deviation of the small berries (in mm)
-        static const float berry_size_small_mean;                // Mean of the small berries (in mm)
-        static const float berry_size_large_standard_deviation;  // Standard deviation of the large berries (in mm)
-        static const float berry_size_large_mean;                // Mean of the large berries (in mm)
+        static const float berry_size_threshold;               // Threshold value to distinguish large berries from small ones (in mm)
         static const int pressure_sensor_thresholds[2];        // Threshold values when we consider the contact as touching (in 5V/1023) [0,1023]
 
         enum class PressureState{

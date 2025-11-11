@@ -1,7 +1,6 @@
 #include <AccelStepper.h>
 #include <Arduino.h>
 
-#include "../Math/gaussian_pdf.h"
 #include "../InterfaceMaster.h"
 #include "../Basket/Basket.h"
 
@@ -26,10 +25,7 @@ const int GripperStepper::steps_per_revolution = 2048;
 const int GripperStepper::speed = 200;
 const int GripperStepper::max_speed = 1200;
 const int GripperStepper::acceleration = 300;
-const float PressureSensor::berry_size_small_standard_deviation = 0;
-const float PressureSensor::berry_size_small_mean = 0;
-const float PressureSensor::berry_size_large_standard_deviation = 0;
-const float PressureSensor::berry_size_large_mean = 0;
+const float PressureSensor::berry_size_threshold = 25;
 const int PressureSensor::pressure_sensor_thresholds[2] = {1023,1023};
 
 GripperController::GripperController(GripperPinout *pinout, InterfaceMaster *interface){
@@ -114,34 +110,13 @@ GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::Gri
                     int current_position_step = this->plate_stepper->currentPosition();
                     int raspberry_width = GripperStepper::steps_to_mm(current_position_step);
 
-                    // z = (x - mean) / stdev
-                    float z_large = (
-                            raspberry_width-PressureSensor::berry_size_large_mean
-                        ) / PressureSensor::berry_size_large_standard_deviation;
-
-                    float z_small = (
-                            raspberry_width-PressureSensor::berry_size_small_mean
-                        ) / PressureSensor::berry_size_small_standard_deviation;
-
-                    float p_w_given_L = gaussian_pdf(z_large);
-                    float p_w_given_S = gaussian_pdf(z_small);
-
-                    float p_L = 0.5, p_S = 0.5;
-
-                    float probability_large = p_w_given_L * p_L / (p_w_given_L * p_L + p_w_given_S * p_S);
-                    float probability_small = p_w_given_S * p_S / (p_w_given_L * p_L + p_w_given_S * p_S);
-
-                    this->interface->send_state("gripper.berry_p_large", probability_large);
-                    this->interface->send_state("gripper.berry_p_small", probability_small);
-
-                    if (probability_large>probability_small){
+                    if (raspberry_width > PressureSensor::berry_size_threshold){
                         size = GripperStepper::RaspberrySize::LARGE;
                         state = GripperStepper::GripperState::CLOSED_LARGE;
                     }else{
                         size = GripperStepper::RaspberrySize::SMALL;
                         state = GripperStepper::GripperState::CLOSED_SMALL;
                     }
-
                 }else{
                     // the stepper reached the desired position without touching a berry. this is fatal.
                     Serial.println((String)+"FATAL ERROR: stepper closed without touching the berry.");
