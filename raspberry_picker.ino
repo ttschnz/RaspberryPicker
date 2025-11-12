@@ -17,6 +17,7 @@ GripperPinout gripper_pinout {
     .color_sensor_pinout = ColorSensor::Pinout{7,6,5,A5},
     .pressure_sensor_pins = {A3,A4},
     .stepper_motor_pins = {8,9,10,11},
+    .limit_switch_pin = 12,
 };
 
 BasketController* basket_controller;

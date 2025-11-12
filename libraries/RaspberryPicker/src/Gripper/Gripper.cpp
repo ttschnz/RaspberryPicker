@@ -8,7 +8,7 @@
 #include "ColorSensor.h"
 #include "GripperStepper.h"
 #include "PressureSensor.h"
-
+#include "LimitSwitch.h"
 
 
 const int ColorSensor::measure_count = 100;
@@ -17,11 +17,11 @@ const int ColorSensor::delay_color = 100;
 const int ColorSensor::delay_calibrate = 2000;
 
 const float GripperStepper::transmission_ratio = 1.5 * 18 * PI;
-const int GripperStepper::plate_distance_open = 90;
+const int GripperStepper::plate_distance_open = 65;
 const int GripperStepper::plate_distance_large = 30;
 const int GripperStepper::plate_distance_small = 20;
-const int GripperStepper::plate_distance_min = 5;
-const int GripperStepper::steps_per_revolution = 2048;
+const int GripperStepper::plate_distance_limit = 15;
+const int GripperStepper::steps_per_revolution = 2048*2;
 const int GripperStepper::speed = 200;
 const int GripperStepper::max_speed = 1200;
 const int GripperStepper::acceleration = 300;
@@ -34,7 +34,7 @@ GripperController::GripperController(GripperPinout *pinout, InterfaceMaster *int
     this->color_sensor = new ColorSensor(pinout->color_sensor_pinout);
     this->pressure_sensor = new PressureSensor(pinout->pressure_sensor_pins);
     this->plate_distance = GripperStepper::plate_distance_open;
-
+    this->limit_switch = new LimitSwitch(pinout->limit_switch_pin);
     this->plate_stepper = new AccelStepper(
         AccelStepper::HALF4WIRE,
         pinout->stepper_motor_pins[0],
@@ -80,9 +80,10 @@ GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::Gri
                 // state with what actually happened.
 
                 // close until the plates get touch feedback
-                int steps = GripperStepper::get_desired_step_position(GripperStepper::GripperState::CLOSED_SMALL);
+                int steps = GripperStepper::mm_to_steps(GripperStepper::plate_distance_limit);
                 this->plate_stepper->moveTo(steps);
                 bool touching = false;
+                bool limit_switch = false;
                 int i = 0;
                 do{
                     this->plate_stepper->run();
@@ -96,13 +97,14 @@ GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::Gri
                     }
 
                     touching = this->pressure_sensor->is_touching();
+                    limit_switch = this->limit_switch->is_touching();
 
-                } while(!touching && this->plate_stepper->isRunning());
+                } while(!touching && !limit_switch && this->plate_stepper->isRunning());
 
 
                 GripperStepper::RaspberrySize size;
                 GripperStepper::GripperState state;
-
+                
                 if (touching){
                     this->plate_stepper->stop();
                     while (this->plate_stepper->isRunning()) this->plate_stepper->run(); // decelerate cleanly
@@ -119,8 +121,18 @@ GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::Gri
                         state = GripperStepper::GripperState::CLOSED_SMALL;
                     }
                 }else{
-                    // the stepper reached the desired position without touching a berry. this is fatal.
-                    Serial.println((String)+"FATAL ERROR: stepper closed without touching the berry.");
+                    if (limit_switch){
+                        // the stepper hit the limit switch without touching a raspberry
+                        this->plate_stepper->stop(); // emergency stop, do not decelerate
+                        Serial.println((String)+"hit limit-switch. resetting to zero.");
+                        this->plate_stepper->setCurrentPosition(
+                            GripperStepper::mm_to_steps(GripperStepper::plate_distance_limit)
+                        );
+                    }
+                    else{
+                        // the stepper reached the "minimal" position, almost touching the limit switch
+                        Serial.println((String)+"closed normally");
+                    }
 
                     // just assume that the berry is small for now
                     state = GripperStepper::GripperState::CLOSED_SMALL;

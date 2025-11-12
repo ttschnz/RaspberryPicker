@@ -51,7 +51,7 @@ class GripperStepper
         static const int plate_distance_open;  // how many mm do we want the plates to be apart from each other in the open state?
         static const int plate_distance_large; // how many mm are the plates apart from each other for a large berry?
         static const int plate_distance_small; // how many mm are the plates apart from each other for a small berry?
-        static const int plate_distance_min;   // what is the minimal distance we should keep between plates? [mm]
+        static const int plate_distance_limit; // how many mm are the plates apart from each other when the limit switch is pressed?
 };
 
 #endif

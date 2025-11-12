@@ -6,6 +6,7 @@
 #include "../InterfaceMaster.h"
 #include "../Basket/Basket.h"
 
+#include "LimitSwitch.h"
 #include "ColorSensor.h"
 #include "PressureSensor.h"
 #include "GripperStepper.h"
@@ -14,6 +15,7 @@ typedef struct {
     ColorSensor::Pinout color_sensor_pinout;
     int pressure_sensor_pins[2];
     int stepper_motor_pins[4];
+    int limit_switch_pin;
 } GripperPinout;
 
 
@@ -55,6 +57,7 @@ class GripperController{
         float plate_distance;
         AccelStepper *plate_stepper;
         InterfaceMaster *interface;
+        LimitSwitch *limit_switch;
         PressureSensor *pressure_sensor;
 };
 
