@@ -21,20 +21,20 @@ bool GripperStepper::deserialize_gripper_state(String gripper_state_str, Gripper
 }
 
 int GripperStepper::mm_to_steps(int mm){
-    int steps =
-        mm   // [mm]
-        * GripperStepper::steps_per_revolution // [stp/rot]
-        / GripperStepper::transmission_ratio; // [mm/rot]
-    return steps;
+    double steps =
+        (double)mm   // [mm]
+        * (double)GripperStepper::steps_per_revolution // [stp/rot]
+        / (double)GripperStepper::transmission_ratio; // [mm/rot]
+    return (int)steps;
 }
 
 
 int GripperStepper::steps_to_mm(int steps){
-    int mm =
-        steps   // [mm]
-        * GripperStepper::transmission_ratio // [mm/rot]
-        / GripperStepper::steps_per_revolution; // [stp/rot]
-    return mm;
+    double mm =
+        (double)steps   // [mm]
+        * (double)GripperStepper::transmission_ratio // [mm/rot]
+        / (double)GripperStepper::steps_per_revolution; // [stp/rot]
+    return (int)mm;
 }
 
 int GripperStepper::get_desired_step_position(GripperState state){
