@@ -9,7 +9,7 @@ class ControlCenter(ctk.CTk):
     controller_programs = ("CLOSE", "RELEASE", "DROP", "RESET", "CALIBRATE_COLOR")
     sorting_states = ("LARGE", "SMALL", "IDLE")
     door_states = ("OPEN", "CLOSED")
-    gripper_states = ("OPEN", "CLOSED")
+    gripper_states = ("OPEN", "CLOSED_LIMIT", "CLOSED_LARGE", "CLOSED_SMALL")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
