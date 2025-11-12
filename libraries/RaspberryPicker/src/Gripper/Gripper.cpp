@@ -121,18 +121,21 @@ GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::Gri
                         state = GripperStepper::GripperState::CLOSED_SMALL;
                     }
                 }else{
-                    if (limit_switch){
-                        // the stepper hit the limit switch without touching a raspberry
-                        this->plate_stepper->stop(); // emergency stop, do not decelerate
-                        Serial.println((String)+"hit limit-switch. resetting to zero.");
-                        this->plate_stepper->setCurrentPosition(
-                            GripperStepper::mm_to_steps(GripperStepper::plate_distance_limit)
-                        );
+                    if (!limit_switch){
+                        // the stepper reached the "minimal" position.
+                        // we continue at low speed until we hit the limit switch
+                        Serial.println((String)+"closed normally. trying to find zero");
+                        this->plate_stepper->setSpeed(-GripperStepper::speed); // negative for closing
+                        while(!this->limit_switch->is_touching()){
+                            this->plate_stepper->runSpeed();
+                        }
                     }
-                    else{
-                        // the stepper reached the "minimal" position, almost touching the limit switch
-                        Serial.println((String)+"closed normally");
-                    }
+                    // the stepper hit the limit switch without touching a raspberry
+                    this->plate_stepper->stop(); // emergency stop, do not decelerate
+                    Serial.println((String)+"hit limit-switch. resetting to zero.");
+                    this->plate_stepper->setCurrentPosition(
+                        GripperStepper::mm_to_steps(GripperStepper::plate_distance_limit)
+                    );
 
                     // just assume that the berry is small for now
                     state = GripperStepper::GripperState::CLOSED_SMALL;
