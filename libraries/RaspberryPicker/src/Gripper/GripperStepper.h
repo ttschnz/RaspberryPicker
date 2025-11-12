@@ -7,12 +7,15 @@
 
 static const char* gripper_state_strings[2] = {
     "OPEN",
-    "CLOSED"
+    "CLOSED_SMALL",
+    "CLOSED_LARGE",
+    "CLOSED_LIMIT",
 };
 
 static const char* raspberry_size_strings[] = {
     "LARGE",
-    "SMALL"
+    "SMALL",
+    "UNKNOWN",
 };
 
 class GripperStepper
@@ -21,7 +24,8 @@ class GripperStepper
     public:
         enum RaspberrySize{
             LARGE,
-            SMALL
+            SMALL,
+            UNKNOWN,
         };
 
         static const char* serialize_raspberry_size(GripperStepper::RaspberrySize raspberry_size);
@@ -33,6 +37,7 @@ class GripperStepper
             OPEN,
             CLOSED_SMALL,
             CLOSED_LARGE,
+            CLOSED_LIMIT,
         };
 
         static const char* serialize_gripper_state(GripperStepper::GripperState gripper_state);

@@ -65,7 +65,20 @@ void Controller::run_close(){
     }
 
     // close grabbing mechanism
-    GripperStepper::RaspberrySize size = this->gripper_controller->set_gripper(GripperStepper::GripperState::CLOSED_SMALL);
+    GripperStepper::RaspberrySize size = this->gripper_controller->set_gripper(GripperStepper::GripperState::CLOSED_LARGE);
+    
+    this->interface->send_state("gripper.raspberry_size", GripperStepper::serialize_raspberry_size(size));
+
+    if (size == GripperStepper::RaspberrySize::UNKNOWN){
+        size = this->gripper_controller->set_gripper(GripperStepper::GripperState::CLOSED_SMALL);
+    }
+    
+    this->interface->send_state("gripper.raspberry_size", GripperStepper::serialize_raspberry_size(size));
+
+    if (size == GripperStepper::RaspberrySize::UNKNOWN){
+        size = this->gripper_controller->set_gripper(GripperStepper::GripperState::CLOSED_LIMIT);
+    }
+
     this->interface->send_state("gripper.raspberry_size", GripperStepper::serialize_raspberry_size(size));
 
 
@@ -76,6 +89,10 @@ void Controller::run_close(){
             break;
         case GripperStepper::RaspberrySize::SMALL:
             this->basket_controller->set_sorting(BasketSorter::SortingState::SMALL);
+            break;
+        case GripperStepper::RaspberrySize::UNKNOWN:
+            // we have closed the gripper until the limit switch and not felt any touch. abort and re-open.
+            this->gripper_controller->set_gripper(GripperStepper::GripperState::OPEN);
             break;
     }
 }

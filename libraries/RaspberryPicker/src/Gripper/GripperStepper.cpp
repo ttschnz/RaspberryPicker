@@ -9,8 +9,12 @@ const char* GripperStepper::serialize_gripper_state(GripperStepper::GripperState
 
 bool GripperStepper::deserialize_gripper_state(String gripper_state_str, GripperStepper::GripperState* out_gripper_state){
     bool matched = true;
-    if (gripper_state_str=="CLOSED"){
+    if (gripper_state_str=="CLOSED_SMALL"){
         *out_gripper_state = GripperStepper::GripperState::CLOSED_SMALL;
+    }else if (gripper_state_str=="CLOSED_LARGE"){
+        *out_gripper_state = GripperStepper::GripperState::CLOSED_LARGE;
+    }else if (gripper_state_str=="CLOSED_LIMIT"){
+        *out_gripper_state = GripperStepper::GripperState::CLOSED_LIMIT;
     }else if (gripper_state_str=="OPEN"){
         *out_gripper_state = GripperStepper::GripperState::OPEN;
     }else{
@@ -49,6 +53,9 @@ int GripperStepper::get_desired_step_position(GripperState state){
         case GripperStepper::GripperState::CLOSED_LARGE:
             desired_mm = GripperStepper::plate_distance_large;
             break;
+        case GripperStepper::GripperState::CLOSED_LIMIT:
+            desired_mm = GripperStepper::plate_distance_limit;
+            break;
     }
 
     int desired_steps = GripperStepper::mm_to_steps(desired_mm);
@@ -68,6 +75,8 @@ bool GripperStepper::deserialize_raspberry_size(String raspberry_size_str, Gripp
         *out_raspberry_size = GripperStepper::RaspberrySize::LARGE;
     }else if (raspberry_size_str=="SMALL"){
         *out_raspberry_size = GripperStepper::RaspberrySize::SMALL;
+    }else if (raspberry_size_str=="UNKNOWN"){
+        *out_raspberry_size = GripperStepper::RaspberrySize::UNKNOWN;
     }else{
         matched = false;
     }

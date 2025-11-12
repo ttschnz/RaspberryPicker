@@ -55,15 +55,10 @@ GripperController::GripperController(GripperPinout *pinout, InterfaceMaster *int
 
 
 GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::GripperState desired_gripper_state){
+    int target_steps = GripperStepper::get_desired_step_position(desired_gripper_state);
     switch (desired_gripper_state){
         case GripperStepper::GripperState::OPEN:
             {
-                int target_steps = GripperStepper::get_desired_step_position(GripperStepper::GripperState::OPEN);
-                int current_steps = this->plate_stepper->currentPosition();
-        
-                int steps_til_open = target_steps - current_steps;
-                Serial.println((String)+"Steps until open: " + steps_til_open);
-
                 this->plate_stepper->runToNewPosition(target_steps); // blocks until there
 
                 int current_position_step = this->plate_stepper->currentPosition();
@@ -73,15 +68,41 @@ GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::Gri
                 this->interface->send_state("gripper.plate_distance", this->plate_distance);
             }
             break;
+        case GripperStepper::GripperState::CLOSED_LIMIT:
+            {
+                this->plate_stepper->moveTo(target_steps);
+                bool limit_switch = false;
+                int i = 0;
+                do{
+                    this->plate_stepper->run();
+
+                    i++;
+                    if(i>1000){
+                        i=0;
+                        int current_position_step = this->plate_stepper->currentPosition();
+                        this->plate_distance = GripperStepper::steps_to_mm(current_position_step);
+                        this->interface->send_state("gripper.plate_distance", this->plate_distance);
+                    }
+
+                    limit_switch = this->limit_switch->is_touching();
+
+                } while(!limit_switch && this->plate_stepper->isRunning());
+
+                if (!limit_switch){
+                    // the stepper reached the "minimal" position.
+                    // we continue at low speed until we hit the limit switch
+                    Serial.println((String)+"closed without reaching limit switch. finding zero");
+                    this->plate_stepper->setSpeed(-GripperStepper::speed); // negative for closing
+                    while(!this->limit_switch->is_touching()){
+                        this->plate_stepper->runSpeed();
+                    }
+                }
+            }
+            break;
         case GripperStepper::GripperState::CLOSED_LARGE:
         case GripperStepper::GripperState::CLOSED_SMALL:
-            {
-                // for both large and small we just move until it touches. then we overwrite the desired
-                // state with what actually happened.
-
-                // close until the plates get touch feedback
-                int steps = GripperStepper::mm_to_steps(GripperStepper::plate_distance_limit);
-                this->plate_stepper->moveTo(steps);
+            {                
+                this->plate_stepper->moveTo(target_steps);
                 bool touching = false;
                 bool limit_switch = false;
                 int i = 0;
@@ -121,25 +142,8 @@ GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::Gri
                         state = GripperStepper::GripperState::CLOSED_SMALL;
                     }
                 }else{
-                    if (!limit_switch){
-                        // the stepper reached the "minimal" position.
-                        // we continue at low speed until we hit the limit switch
-                        Serial.println((String)+"closed normally. trying to find zero");
-                        this->plate_stepper->setSpeed(-GripperStepper::speed); // negative for closing
-                        while(!this->limit_switch->is_touching()){
-                            this->plate_stepper->runSpeed();
-                        }
-                    }
-                    // the stepper hit the limit switch without touching a raspberry
-                    this->plate_stepper->stop(); // emergency stop, do not decelerate
-                    Serial.println((String)+"hit limit-switch. resetting to zero.");
-                    this->plate_stepper->setCurrentPosition(
-                        GripperStepper::mm_to_steps(GripperStepper::plate_distance_limit)
-                    );
-
-                    // just assume that the berry is small for now
-                    state = GripperStepper::GripperState::CLOSED_SMALL;
-                    size = GripperStepper::RaspberrySize::SMALL;
+                    state = desired_gripper_state;
+                    size = GripperStepper::RaspberrySize::UNKNWON;
                 }
 
                 this->gripper_state = state;
