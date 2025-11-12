@@ -40,7 +40,7 @@ GripperController::GripperController(GripperPinout *pinout, InterfaceMaster *int
         pinout->stepper_motor_pins[0],
         pinout->stepper_motor_pins[2],
         pinout->stepper_motor_pins[1],
-        pinout->stepper_motor_pins[4]
+        pinout->stepper_motor_pins[3]
     );
 
     this->plate_stepper->setCurrentPosition(
@@ -60,17 +60,14 @@ GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::Gri
             {
                 int target_steps = GripperStepper::get_desired_step_position(GripperStepper::GripperState::OPEN);
                 int current_steps = this->plate_stepper->currentPosition();
-
+        
                 int steps_til_open = target_steps - current_steps;
                 Serial.println((String)+"Steps until open: " + steps_til_open);
 
                 this->plate_stepper->runToNewPosition(target_steps); // blocks until there
 
-                this->plate_distance = this->plate_distance -
-                    steps_til_open *  // [stp]
-                    GripperStepper::transmission_ratio /     // [mm/rot]
-                    GripperStepper::steps_per_revolution;    // [rot/stp]
-
+                int current_position_step = this->plate_stepper->currentPosition();
+                this->plate_distance = GripperStepper::steps_to_mm(current_position_step);
                 this->gripper_state = GripperStepper::GripperState::OPEN;
                 this->interface->send_state("gripper.gripper_state", GripperStepper::serialize_gripper_state(this->gripper_state));
                 this->interface->send_state("gripper.plate_distance", this->plate_distance);
@@ -86,13 +83,17 @@ GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::Gri
                 int steps = GripperStepper::get_desired_step_position(GripperStepper::GripperState::CLOSED_SMALL);
                 this->plate_stepper->moveTo(steps);
                 bool touching = false;
-
+                int i = 0;
                 do{
                     this->plate_stepper->run();
 
-                    int current_position_step = this->plate_stepper->currentPosition();
-                    int current_position_mm = GripperStepper::steps_to_mm(current_position_step);
-                    this->interface->send_state("gripper.plate_distance", current_position_mm);
+                    i++;
+                    if(i>1000){
+                        i=0;
+                        int current_position_step = this->plate_stepper->currentPosition();
+                        this->plate_distance = GripperStepper::steps_to_mm(current_position_step);
+                        this->interface->send_state("gripper.plate_distance", this->plate_distance);
+                    }
 
                     touching = this->pressure_sensor->is_touching();
 
