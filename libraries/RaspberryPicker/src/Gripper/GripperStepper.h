@@ -5,7 +5,7 @@
 #define PI 3.141592653589793
 #endif
 
-static const char* gripper_state_strings[2] = {
+static const char* gripper_state_strings[4] = {
     "OPEN",
     "CLOSED_SMALL",
     "CLOSED_LARGE",

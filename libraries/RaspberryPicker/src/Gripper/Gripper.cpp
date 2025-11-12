@@ -97,6 +97,9 @@ GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::Gri
                         this->plate_stepper->runSpeed();
                     }
                 }
+                this->plate_stepper->setCurrentPosition(
+                    GripperStepper::get_desired_step_position(GripperStepper::GripperState::CLOSED_LIMIT)
+                );
             }
             break;
         case GripperStepper::GripperState::CLOSED_LARGE:
@@ -143,7 +146,7 @@ GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::Gri
                     }
                 }else{
                     state = desired_gripper_state;
-                    size = GripperStepper::RaspberrySize::UNKNWON;
+                    size = GripperStepper::RaspberrySize::UNKNOWN;
                 }
 
                 this->gripper_state = state;
