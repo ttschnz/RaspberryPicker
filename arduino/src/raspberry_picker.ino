@@ -63,13 +63,13 @@ void loop() {
     case Controller::State::PROGRAM:
       interface_master->listen_state_change_requests();
             switch (controller->get_program()){
-        case Controller::Program::CLOSE:
+        case Controller::Program::CLOSE_GRIPPER:
           controller->run_close();
           break;
-        case Controller::Program::RELEASE:
+        case Controller::Program::RELEASE_GRIPPER:
           controller->run_release();
           break;
-        case Controller::Program::DROP:
+        case Controller::Program::EMPTY_BASKET:
           controller->run_drop();
           break;
         case Controller::Program::RESET:
