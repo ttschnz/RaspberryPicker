@@ -2,13 +2,6 @@
 #define RASPBERRY_PICKER_BASKET_SORTING_H
 #include <Arduino.h>
 
-static const char* sorting_state_strings[] = {
-    "LARGE",
-    "SMALL",
-    "IDLE"
-};
-
-
 class BasketSorter
 {
     public:

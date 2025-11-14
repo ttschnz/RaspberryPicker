@@ -9,6 +9,11 @@ PressureSensor::PressureSensor(int pinout[2]){
     pinMode(this->pinout[1], INPUT);
 }
 
+static const char* pressure_state_strings[] = {
+    "TOUCHING",
+    "NOT_TOUCHING",
+};
+
 const char* PressureSensor::serialize_pressure_state(PressureSensor::PressureState pressure_state){
     int idx = (int)pressure_state;
     return pressure_state_strings[idx];

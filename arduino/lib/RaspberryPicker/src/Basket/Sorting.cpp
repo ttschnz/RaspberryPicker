@@ -1,5 +1,13 @@
 #include <Arduino.h>
 #include "Sorting.h"
+
+
+static const char* sorting_state_strings[] = {
+    "LARGE",
+    "SMALL",
+    "IDLE"
+};
+
 const char* BasketSorter::serialize_sorting_state(BasketSorter::SortingState sorting_state){
     int idx = (int)sorting_state;
     return sorting_state_strings[idx];

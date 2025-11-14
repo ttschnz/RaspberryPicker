@@ -1,11 +1,6 @@
 #ifndef RASPBERRY_PICKER_GRIPPER_PRESSURE_SENSOR_H
 #define RASPBERRY_PICKER_GRIPPER_PRESSURE_SENSOR_H
 
-static const char* pressure_state_strings[] = {
-    "TOUCHING",
-    "NOT_TOUCHING",
-};
-
 class PressureSensor{
     public:
         PressureSensor(int pinout[2]);

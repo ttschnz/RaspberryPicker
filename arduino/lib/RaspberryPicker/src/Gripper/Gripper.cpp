@@ -79,6 +79,7 @@ GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::Gri
                 this->gripper_state = GripperStepper::GripperState::OPEN;
                 this->interface->send_state("gripper.gripper_state", GripperStepper::serialize_gripper_state(this->gripper_state));
                 this->interface->send_state("gripper.plate_distance", this->plate_distance);
+                return GripperStepper::RaspberrySize::UNKNOWN;
             }
             break;
         case GripperStepper::GripperState::CLOSED_LIMIT:
@@ -113,6 +114,7 @@ GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::Gri
                 this->plate_stepper->setCurrentPosition(
                     GripperStepper::get_desired_step_position(GripperStepper::GripperState::CLOSED_LIMIT)
                 );
+                return GripperStepper::RaspberrySize::UNKNOWN;
             }
             break;
         case GripperStepper::GripperState::CLOSED_LARGE:
@@ -172,7 +174,7 @@ GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::Gri
             }
             break;
     }
-
+    return GripperStepper::RaspberrySize::UNKNOWN;
 }
 
 bool GripperController::is_ripe(){

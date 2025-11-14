@@ -2,6 +2,13 @@
 #include "GripperStepper.h"
 
 
+static const char* gripper_state_strings[4] = {
+    "OPEN",
+    "CLOSED_SMALL",
+    "CLOSED_LARGE",
+    "CLOSED_LIMIT",
+};
+
 const char* GripperStepper::serialize_gripper_state(GripperStepper::GripperState gripper_state){
     int idx = (int)gripper_state;
     return gripper_state_strings[idx];
@@ -62,6 +69,12 @@ int GripperStepper::get_desired_step_position(GripperState state){
 
     return desired_steps;
 }
+
+static const char* raspberry_size_strings[] = {
+    "LARGE",
+    "SMALL",
+    "UNKNOWN",
+};
 
 const char* GripperStepper::serialize_raspberry_size(GripperStepper::RaspberrySize raspberry_size){
     int idx = (int)raspberry_size;

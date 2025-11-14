@@ -1,14 +1,6 @@
 #ifndef RASPBERRY_PICKER_BASKET_DOOR_H
 #define RASPBERRY_PICKER_BASKET_DOOR_H
 
-
-
-static const char* door_state_strings[] = {
-    "OPEN",
-    "CLOSED"
-};
-
-
 class BasketDoor
 {
     public:
