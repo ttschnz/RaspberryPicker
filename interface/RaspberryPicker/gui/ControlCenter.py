@@ -6,7 +6,7 @@ from RaspberryPicker.state import State
 
 class ControlCenter(ctk.CTk):
     controller_states = ("MANUAL", "IDLE", "PROGRAM")
-    controller_programs = ("CLOSE", "RELEASE", "DROP", "RESET", "CALIBRATE_COLOR")
+    controller_programs = ("CLOSE_GRIPPER", "RELEASE_GRIPPER", "EMPTY_BASKET", "RESET", "CALIBRATE_COLOR")
     sorting_states = ("LARGE", "SMALL", "IDLE")
     door_states = ("OPEN", "CLOSED")
     gripper_states = ("OPEN", "CLOSED_LIMIT", "CLOSED_LARGE", "CLOSED_SMALL")

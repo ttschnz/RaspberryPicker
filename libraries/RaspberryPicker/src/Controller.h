@@ -18,9 +18,9 @@ class Controller{
 
 
         enum Program{
-            CLOSE,
-            RELEASE,
-            DROP,
+            CLOSE_GRIPPER,
+            RELEASE_GRIPPER,
+            EMPTY_BASKET,
             RESET,
             CALIBRATE_COLOR,
         };

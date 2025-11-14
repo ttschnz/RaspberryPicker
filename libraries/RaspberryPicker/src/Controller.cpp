@@ -127,22 +127,22 @@ const char* Controller::serialize_program(Program program){
     int idx = static_cast<int>(program);
 
     const char * program_strings[5] ={
-        "CLOSE",
-        "RELEASE",
-        "DROP",
+        "CLOSE_GRIPPER",
+        "RELEASE_GRIPPER",
+        "EMPTY_BASKET",
         "RESET",
-        "CALIBRATE_COLOR"
+        "CALIBRATE_COLOR",
     };
     return program_strings[idx];
 }
 bool Controller::deserialize_program(String program, Controller::Program* out_program){
     bool matched = true;
-    if (program == "CLOSE"){
-        *out_program = Controller::Program::CLOSE;
-    } else if(program== "RELEASE"){
-        *out_program = Controller::Program::RELEASE;
-    } else if(program== "DROP"){
-        *out_program = Controller::Program::DROP;
+    if (program == "CLOSE_GRIPPER"){
+        *out_program = Controller::Program::CLOSE_GRIPPER;
+    } else if(program== "RELEASE_GRIPPER"){
+        *out_program = Controller::Program::RELEASE_GRIPPER;
+    } else if(program== "EMPTY_BASKET"){
+        *out_program = Controller::Program::EMPTY_BASKET;
     } else if(program== "RESET"){
         *out_program = Controller::Program::RESET;
     } else if(program == "CALIBRATE_COLOR"){
