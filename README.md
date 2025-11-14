@@ -8,24 +8,24 @@ This project integrates an arduino with a Python-based control interface.
 ## Project Structure
 ```
 .
-├── raspberry_picker.ino # Main Arduino entry point
-├── /libraries/ # Custom and third-party Arduino libraries
-│   ├── RaspberryPicker/ # Core library implementing control logic
-│   │   ├── Controller.h
-│   │   ├── Controller.cpp
-│   │   ├── Gripper/
-│   │   │   ├── Gripper.h
-│   │   │   ├── Gripper.cpp
-│   │       └── ... # sensors & sub-controllers (closing, color sensor, pressure, ...)
-│   │   └── Basket/ # implementation of the basket controller and its sensors
-│   │       ├── Basket.h
-│   │       ├── Basket.cpp
-│   │       └── ... # sensors & sub-controllers (door, sorting)
-│   └── ... # Other dependencies (Json, Servo, Stepper)
-├── /interface/ # Python-based GUI for serial communication and control
+├── /arduino/                    # Code for the arduino
+│   ├── src/raspberry_picker.ino # Main Arduino entry point
+│   └── lib/RaspberryPicker/     # Core library implementing control logic
+│       ├── Controller.h
+│       ├── Controller.cpp
+│       ├── Gripper/
+│       │   ├── Gripper.h
+│       │   ├── Gripper.cpp
+│       │   └── ...              # sensors & sub-controllers (closing, color sensor, pressure, ...)
+│       └── Basket/              # implementation of the basket controller and its motors
+│           ├── Basket.h
+│           ├── Basket.cpp
+│           └── ...              # sensors & sub-controllers (door, sorting)
+├── /interface/                  # Python-based GUI for serial communication and control
 │   ├── main.py
 │   └── ...
-└── README.md # This document
+├── /fritzing/                   # circuit drawings
+└── README.md                    # This document
 ```
 
 
