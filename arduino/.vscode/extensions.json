@@ -2,7 +2,10 @@
     // See http://go.microsoft.com/fwlink/?LinkId=827846
     // for the documentation about the extensions.json format
     "recommendations": [
-        "platformio.platformio-ide"
+        "platformio.platformio-ide",
+        "ms-vscode.cpptools",
+        "hbenl.vscode-test-explorer",
+        "ms-vscode.test-adapter-converter",
     ],
     "unwantedRecommendations": [
         "ms-vscode.cpptools-extension-pack"
