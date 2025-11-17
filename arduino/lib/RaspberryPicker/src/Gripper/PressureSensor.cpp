@@ -3,10 +3,10 @@
 
 PressureSensor::PressureSensor(int pinout[2]){
     this->pinout[0] = pinout[0];
-    this->pinout[1] = pinout[1];
+    //this->pinout[1] = pinout[1];
 
     pinMode(this->pinout[0], INPUT);
-    pinMode(this->pinout[1], INPUT);
+    //pinMode(this->pinout[1], INPUT);
 }
 
 static const char* pressure_state_strings[] = {
@@ -33,13 +33,13 @@ bool PressureSensor::deserialize_pressure_state(String pressure_state_str, Press
 
 
 bool PressureSensor::is_touching(){
-    int voltages[2];
+    int voltages[1];
     voltages[0] = analogRead(this->pinout[0]);
-    voltages[1] = analogRead(this->pinout[1]);
+    //voltages[1] = analogRead(this->pinout[1]);
 
-    bool touching[2];
+    bool touching[1];
     touching[0] = this->pressure_sensor_thresholds[0] < voltages[0];
-    touching[1] = this->pressure_sensor_thresholds[1] < voltages[1];
+    //touching[1] = this->pressure_sensor_thresholds[1] > voltages[1];
 
-    return touching[0] && touching[1];
+    return touching[0]; //&& touching[1];
 }

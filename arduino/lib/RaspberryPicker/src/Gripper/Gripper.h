@@ -13,7 +13,7 @@
 
 typedef struct {
     ColorSensor::Pinout color_sensor_pinout;
-    int pressure_sensor_pins[2];
+    int pressure_sensor_pins[1];
     int stepper_motor_pins[4];
     int limit_switch_pin;
 } GripperPinout;

@@ -3,7 +3,7 @@
 
 class PressureSensor{
     public:
-        PressureSensor(int pinout[2]);
+        PressureSensor(int pinout[1]);
 
         static const float berry_size_threshold;               // Threshold value to distinguish large berries from small ones (in mm)
         static const int pressure_sensor_thresholds[2];        // Threshold values when we consider the contact as touching (in 5V/1023) [0,1023]
@@ -31,7 +31,7 @@ class PressureSensor{
          */
         bool is_touching();
     private:
-        int pinout[2];
+        int pinout[1];
 };
 
 #endif
