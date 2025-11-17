@@ -20,6 +20,7 @@ class BasketDoor
         static const int closed_pos;        // position at which the both containers are closed  [deg]
         static const int open_pos;          // position at which the berry container is open [deg]
         static const int max_fill;          // how many raspberries can we fit?
+        static const int delay_ms;          // how long do we need to wait between opening and closing the door? (i.e. how slow are the servos?) [ms]
 };
 
 #endif

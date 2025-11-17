@@ -108,6 +108,7 @@ void Controller::run_release(){
 void Controller::run_drop(){
     this->basket_controller->set_door(BasketDoor::DoorState::OPEN);
     this->basket_controller->reset_counter(false);
+    delay(BasketDoor::delay_ms);
     this->basket_controller->set_door(BasketDoor::DoorState::CLOSED);
 }
 

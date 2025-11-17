@@ -14,6 +14,7 @@ const int BasketSorter::large_pos = 152;
 const int BasketDoor::closed_pos = 170;
 const int BasketDoor::open_pos = 10;
 const int BasketDoor::max_fill = 23;
+const int BasketDoor::delay_ms = 5000;
 
 BasketController::BasketController(BasketPinout *pinout,InterfaceMaster *interface){
     this->interface = interface;
