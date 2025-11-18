@@ -146,7 +146,7 @@ GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::Gri
                 
                 if (touching){
                     this->plate_stepper->stop();
-                    while (this->plate_stepper->isRunning()) this->plate_stepper->run(); // decelerate cleanly
+                    //while (this->plate_stepper->isRunning()) this->plate_stepper->run(); // decelerate cleanly
 
 
                     int current_position_step = this->plate_stepper->currentPosition();
