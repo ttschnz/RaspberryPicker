@@ -98,11 +98,11 @@ void Controller::run_close(){
 }
 
 void Controller::run_release(){
-    this->basket_controller->set_sorting(BasketSorter::SortingState::IDLE);
     this->gripper_controller->set_gripper(GripperStepper::GripperState::OPEN);
     if (this->basket_controller->increment_counter()==false){
         Serial.println((String)"cannot increment counter on sorting state " + BasketSorter::serialize_sorting_state(this->basket_controller->sorting_state));
     }
+    this->basket_controller->set_sorting(BasketSorter::SortingState::IDLE);
 }
 
 void Controller::run_drop(){
