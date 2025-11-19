@@ -26,7 +26,7 @@ const int GripperStepper::speed = 200;
 const int GripperStepper::max_speed = 1200;
 const int GripperStepper::acceleration = 300;
 const float PressureSensor::berry_size_threshold = 25;
-const int PressureSensor::pressure_sensor_thresholds[2] = {200,200};
+const int PressureSensor::pressure_sensor_thresholds[2] = {5,5};
 
 GripperController::GripperController(GripperPinout *pinout, InterfaceMaster *interface){
     this->interface = interface;
