@@ -113,6 +113,7 @@ void Controller::run_drop(){
 }
 
 void Controller::run_reset(){
+    this->gripper_controller->set_gripper(GripperStepper::GripperState::CLOSED_LIMIT);
     this->gripper_controller->set_gripper(GripperStepper::GripperState::OPEN);
     this->basket_controller->set_door(BasketDoor::DoorState::CLOSED);
     this->basket_controller->set_sorting(BasketSorter::SortingState::IDLE);
