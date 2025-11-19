@@ -23,6 +23,7 @@ class Controller{
             EMPTY_BASKET,
             RESET,
             CALIBRATE_COLOR,
+            MEASURE_PRESSURE,
         };
 
         const char* serialize_program(Program program);
@@ -87,7 +88,12 @@ class Controller{
          */
         void run_calibrate_color();
 
-    private:
+        /**
+         * Program MEASURE_PRESSURE:
+         * Used to test the pressure sensor and find okay threshold values
+         */
+        void run_measure_pressure();
+
         State state;
         Program program;
 

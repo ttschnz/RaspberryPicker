@@ -48,17 +48,19 @@ class GripperController{
         bool is_ripe();
 
         ColorSensor *color_sensor;
-    private:
-
-        ~GripperController() {
-            delete plate_stepper;  // prevent memory leak
-        }
         GripperStepper::GripperState gripper_state;
         float plate_distance;
         AccelStepper *plate_stepper;
         InterfaceMaster *interface;
         LimitSwitch *limit_switch;
         PressureSensor *pressure_sensor;
+
+    private:
+
+        ~GripperController() {
+            delete plate_stepper;  // prevent memory leak
+        }
+        
 };
 
 #endif

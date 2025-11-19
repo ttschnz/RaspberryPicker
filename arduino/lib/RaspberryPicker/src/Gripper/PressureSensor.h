@@ -29,7 +29,7 @@ class PressureSensor{
          * (i.e. we think the plates touch a berry)
          * returns false if this is not the case.
          */
-        bool is_touching();
+        bool is_touching(bool log);
     private:
         int pinout[1];
 };

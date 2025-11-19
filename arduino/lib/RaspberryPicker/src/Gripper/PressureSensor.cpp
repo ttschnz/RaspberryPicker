@@ -32,7 +32,7 @@ bool PressureSensor::deserialize_pressure_state(String pressure_state_str, Press
 }
 
 
-bool PressureSensor::is_touching(){
+bool PressureSensor::is_touching(bool log){
     int voltages[1];
     voltages[0] = analogRead(this->pinout[0]);
     //voltages[1] = analogRead(this->pinout[1]);
@@ -41,5 +41,8 @@ bool PressureSensor::is_touching(){
     touching[0] = this->pressure_sensor_thresholds[0] < voltages[0];
     //touching[1] = this->pressure_sensor_thresholds[1] > voltages[1];
 
+    if (log){
+        Serial.println((String)"currnt pressure reading: " + voltages[0]);
+    }
     return touching[0]; //&& touching[1];
 }

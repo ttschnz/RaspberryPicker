@@ -6,6 +6,7 @@
 
 #include "Gripper/Gripper.h"
 #include "Gripper/GripperStepper.h"
+#include "Gripper/PressureSensor.h"
 Controller::Controller(State state){
     Controller(state, nullptr);
 }
@@ -125,16 +126,23 @@ void Controller::run_calibrate_color(){
     this->gripper_controller->color_sensor->calibrate();
 }
 
+void Controller::run_measure_pressure(){
+    while (Serial.available()==0){
+        this->gripper_controller->pressure_sensor->is_touching(true);
+        delay(100);
+    }
+}
 
 const char* Controller::serialize_program(Program program){
     int idx = static_cast<int>(program);
 
-    const char * program_strings[5] ={
+    const char * program_strings[6] ={
         "CLOSE_GRIPPER",
         "RELEASE_GRIPPER",
         "EMPTY_BASKET",
         "RESET",
         "CALIBRATE_COLOR",
+        "MEASURE_PRESSURE",
     };
     return program_strings[idx];
 }
@@ -150,6 +158,8 @@ bool Controller::deserialize_program(String program, Controller::Program* out_pr
         *out_program = Controller::Program::RESET;
     } else if(program == "CALIBRATE_COLOR"){
         *out_program = Controller::Program::CALIBRATE_COLOR;
+    } else if(program == "MEASURE_PRESSURE"){
+        *out_program = Controller::Program::MEASURE_PRESSURE;
     } else{
         matched = false;
     }

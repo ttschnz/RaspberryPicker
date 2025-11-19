@@ -79,6 +79,9 @@ void loop() {
           Serial.println("running calibrate color");
           controller->run_calibrate_color();
           break;
+        case Controller::Program::MEASURE_PRESSURE:
+          controller->run_measure_pressure();
+          break;
       }
       controller->set_state(Controller::State::IDLE);
       break;
