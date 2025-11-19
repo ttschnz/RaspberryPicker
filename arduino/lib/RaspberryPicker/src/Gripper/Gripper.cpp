@@ -72,8 +72,6 @@ GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::Gri
                     }
                 }
 
-                this->plate_stepper->runToNewPosition(target_steps); // blocks until there
-
                 int current_position_step = this->plate_stepper->currentPosition();
                 this->plate_distance = GripperStepper::steps_to_mm(current_position_step);
                 this->gripper_state = GripperStepper::GripperState::OPEN;
