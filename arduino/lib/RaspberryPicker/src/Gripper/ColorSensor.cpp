@@ -75,5 +75,8 @@ void ColorSensor::calibrate(){
 
     this->white = raw_white;
     this->black = raw_black;
+    Serial.println((String)"gripper.color.white_calibration=" + raw_white.r + "/" + raw_white.g + "/" + raw_white.b);
+    Serial.println((String)"gripper.color.black_calibration=" + raw_black.r + "/" + raw_black.g + "/" + raw_black.b);
+    
     Serial.println("calibrated");
 }
