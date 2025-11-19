@@ -135,7 +135,7 @@ GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::Gri
                         this->interface->send_state("gripper.plate_distance", this->plate_distance);
                     }
 
-                    touching = this->pressure_sensor->is_touching();
+                    touching = this->pressure_sensor->is_touching(i%1000==0);
                     limit_switch = this->limit_switch->is_touching();
 
                 } while(!touching && !limit_switch && this->plate_stepper->isRunning());
