@@ -16,6 +16,10 @@ const int ColorSensor::delay_probe = 10;
 const int ColorSensor::delay_color = 100;
 const int ColorSensor::delay_calibrate = 2000;
 
+const int ColorSensor3LDR::measure_count = 10;
+const int ColorSensor3LDR::delay_probe = 10;
+
+
 const float GripperStepper::transmission_ratio = 1.5 * 18 * PI;
 const int GripperStepper::plate_distance_open = 65;
 const int GripperStepper::plate_distance_large = 30;
@@ -31,7 +35,7 @@ const int PressureSensor::pressure_sensor_thresholds[2] = {5,5};
 GripperController::GripperController(GripperPinout *pinout, InterfaceMaster *interface){
     this->interface = interface;
     this->gripper_state = GripperStepper::GripperState::OPEN;
-    this->color_sensor = new ColorSensor(pinout->color_sensor_pinout);
+    this->color_sensor = new ColorSensor3LDR(pinout->color_sensor_pinout);
     this->pressure_sensor = new PressureSensor(pinout->pressure_sensor_pins);
     this->plate_distance = GripperStepper::plate_distance_open;
     this->limit_switch = new LimitSwitch(pinout->limit_switch_pin);
@@ -176,7 +180,7 @@ GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::Gri
 }
 
 bool GripperController::is_ripe(){
-    RGB color = this->color_sensor->measure_rgb();
+    RGB_3LDR color = this->color_sensor->measure_rgb();
 
     this->interface->send_state("gripper.ripeness.r", color.r);
     this->interface->send_state("gripper.ripeness.g", color.g);

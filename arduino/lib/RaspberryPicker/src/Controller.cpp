@@ -122,8 +122,8 @@ void Controller::run_reset(){
 }
 
 void Controller::run_calibrate_color(){
-    Serial.println("calibrating colors");
-    this->gripper_controller->color_sensor->calibrate();
+    Serial.println("calibrating colors -- skipping for new color sensor");
+    //this->gripper_controller->color_sensor->calibrate();
 }
 
 void Controller::run_measure_pressure(){
@@ -135,8 +135,8 @@ void Controller::run_measure_pressure(){
 
 void Controller::run_measure_color(){
     while (Serial.available()==0){
-        RAW_RGB rgb_raw = this->gripper_controller->color_sensor->measure_rgb_raw();
-        Serial.println((String)"raw_value:" + rgb_raw.r + "/" + rgb_raw.g + "/" + rgb_raw.b + "/" + rgb_raw.noise);    
+        RAW_RGB_3LDR rgb_raw = this->gripper_controller->color_sensor->measure_rgb_raw();
+        Serial.println((String)"raw_value:" + rgb_raw.ambient[0] + "/" + rgb_raw.ambient[1] + "/" + rgb_raw.ambient[2] + "/" + rgb_raw.illuminated[0]+ "/" + rgb_raw.illuminated[1]+ "/" + rgb_raw.illuminated[2]);    
         delay(100);
     }
 }

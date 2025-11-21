@@ -6,7 +6,7 @@
 #include <Basket/Basket.h>
 #include <Gripper/Gripper.h>
 
-#include <Gripper/ColorSensor.h>
+#include <Gripper/ColorSensor3LDR.h>
 
 BasketPinout basket_pinout {
   .sorting_pin = 13,
@@ -14,7 +14,7 @@ BasketPinout basket_pinout {
 };
 
 GripperPinout gripper_pinout {
-    .color_sensor_pinout = ColorSensor::Pinout{7,6,5,A5},
+    .color_sensor_pinout = ColorSensor3LDR::Pinout{A1,A2,A3,13},
     .pressure_sensor_pins = {A4},
     .stepper_motor_pins = {8,9,10,11},
     .limit_switch_pin = 4,
