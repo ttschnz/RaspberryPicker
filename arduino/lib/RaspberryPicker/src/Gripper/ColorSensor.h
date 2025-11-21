@@ -49,7 +49,7 @@ class ColorSensor
         * Measures the red green and blue channel separately. This returns the
         * raw reading values no matter wether the sensor is calibrated or not.
         */
-        void measure_rgb_raw(float* out_r, float* out_g, float*out_b);
+        RGB measure_rgb_raw();
     private:
 
         // reference white reading

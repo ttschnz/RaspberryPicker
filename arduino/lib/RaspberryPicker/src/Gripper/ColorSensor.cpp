@@ -14,7 +14,7 @@ ColorSensor::ColorSensor(ColorSensor::Pinout pinout){
     this->white = RGB{1,1,1};
 }
 
-void ColorSensor::measure_rgb_raw(float* out_r, float* out_g, float*out_b){
+RGB ColorSensor::measure_rgb_raw(){
     int led_pins[3] = {
         this->pinout.led_r,
         this->pinout.led_g,
@@ -35,16 +35,17 @@ void ColorSensor::measure_rgb_raw(float* out_r, float* out_g, float*out_b){
         delay(ColorSensor::delay_color);
     }
 
-    *out_r = raw_measurement[0];
-    *out_g = raw_measurement[1];
-    *out_b = raw_measurement[2];
-
-    return;
+    RGB out_rgb{
+        .r=raw_measurement[0],
+        .g=raw_measurement[1],
+        .b=raw_measurement[2]
+    };
+    
+    return out_rgb;
 }
 
 RGB ColorSensor::measure_rgb(){
-    RGB raw_rgb;
-    this->measure_rgb_raw(&raw_rgb.r, &raw_rgb.g, &raw_rgb.b);
+    RGB raw_rgb = this->measure_rgb_raw();
 
     RGB normalised = RGB{
         (raw_rgb.r - this->black.r) / (this->white.r - this->black.r),
@@ -65,13 +66,11 @@ RGB ColorSensor::measure_rgb(){
 void ColorSensor::calibrate(){
     Serial.println("calibrating white");
     delay(ColorSensor::delay_calibrate);
-    RGB raw_white;
-    this->measure_rgb_raw(&raw_white.r, &raw_white.g, &raw_white.b);
+    RGB raw_white = this->measure_rgb_raw();
 
     Serial.println("calibrating black");
     delay(ColorSensor::delay_calibrate);
-    RGB raw_black;
-    this->measure_rgb_raw(&raw_black.r, &raw_black.g, &raw_black.b);
+    RGB raw_black = this->measure_rgb_raw();
 
     this->white = raw_white;
     this->black = raw_black;
