@@ -133,16 +133,29 @@ void Controller::run_measure_pressure(){
     }
 }
 
+void Controller::run_measure_color(){
+    while (Serial.available()==0){
+        RGB rgb_raw;
+        this->gripper_controller->color_sensor->measure_rgb_raw(&rgb_raw.r,&rgb_raw.g,&rgb_raw.b);
+        //RGB rgb_measured = this->gripper_controller->color_sensor->measure_rgb();
+        Serial.println((String)"raw_value:" + rgb_raw.r + "/" + rgb_raw.g + "/" + rgb_raw.b);
+        //Serial.println((String)"normalised_value:" + rgb_measured.r + "/" + rgb_measured.g + "/" + rgb_measured.b);
+    
+        delay(100);
+    }
+}
+
 const char* Controller::serialize_program(Program program){
     int idx = static_cast<int>(program);
 
-    const char * program_strings[6] ={
+    const char * program_strings[] ={
         "CLOSE_GRIPPER",
         "RELEASE_GRIPPER",
         "EMPTY_BASKET",
         "RESET",
         "CALIBRATE_COLOR",
         "MEASURE_PRESSURE",
+        "MEASURE_COLOR",
     };
     return program_strings[idx];
 }
@@ -160,6 +173,8 @@ bool Controller::deserialize_program(String program, Controller::Program* out_pr
         *out_program = Controller::Program::CALIBRATE_COLOR;
     } else if(program == "MEASURE_PRESSURE"){
         *out_program = Controller::Program::MEASURE_PRESSURE;
+    } else if(program == "MEASURE_COLOR"){
+        *out_program = Controller::Program::MEASURE_COLOR;
     } else{
         matched = false;
     }

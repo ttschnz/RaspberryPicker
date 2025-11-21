@@ -82,6 +82,9 @@ void loop() {
         case Controller::Program::MEASURE_PRESSURE:
           controller->run_measure_pressure();
           break;
+        case Controller::Program::MEASURE_COLOR:
+          controller->run_measure_color();
+          break;
       }
       controller->set_state(Controller::State::IDLE);
       break;

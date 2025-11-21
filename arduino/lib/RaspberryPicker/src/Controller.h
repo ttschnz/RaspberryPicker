@@ -24,6 +24,7 @@ class Controller{
             RESET,
             CALIBRATE_COLOR,
             MEASURE_PRESSURE,
+            MEASURE_COLOR,
         };
 
         const char* serialize_program(Program program);
@@ -93,6 +94,12 @@ class Controller{
          * Used to test the pressure sensor and find okay threshold values
          */
         void run_measure_pressure();
+
+        /**
+         * Program MEASURE_COLOR:
+         * Used to test the color sensor and find okay threshold values
+         */
+        void run_measure_color();
 
         State state;
         Program program;

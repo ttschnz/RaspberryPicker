@@ -11,7 +11,7 @@
 #include "LimitSwitch.h"
 
 
-const int ColorSensor::measure_count = 100;
+const int ColorSensor::measure_count = 10;
 const int ColorSensor::delay_probe = 10;
 const int ColorSensor::delay_color = 100;
 const int ColorSensor::delay_calibrate = 2000;
