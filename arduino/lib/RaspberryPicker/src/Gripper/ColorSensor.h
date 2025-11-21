@@ -1,5 +1,13 @@
 #ifndef RASPBERRY_PICKER_GRIPPER_COLOR_SENSOR_H
 #define RASPBERRY_PICKER_GRIPPER_COLOR_SENSOR_H
+
+struct RAW_RGB{
+    float r;
+    float g;
+    float b;
+    float noise;
+};
+
 struct RGB{
     float r;
     float g;
@@ -49,13 +57,13 @@ class ColorSensor
         * Measures the red green and blue channel separately. This returns the
         * raw reading values no matter wether the sensor is calibrated or not.
         */
-        RGB measure_rgb_raw();
+        RAW_RGB measure_rgb_raw();
     private:
 
         // reference white reading
-        RGB white;
+        RAW_RGB white;
         // reference black reading
-        RGB black;
+        RAW_RGB black;
         Pinout pinout;
 };
 

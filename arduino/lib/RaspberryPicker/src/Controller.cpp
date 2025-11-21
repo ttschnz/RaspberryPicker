@@ -135,11 +135,8 @@ void Controller::run_measure_pressure(){
 
 void Controller::run_measure_color(){
     while (Serial.available()==0){
-        RGB rgb_raw = this->gripper_controller->color_sensor->measure_rgb_raw();
-        //RGB rgb_measured = this->gripper_controller->color_sensor->measure_rgb();
-        Serial.println((String)"raw_value:" + rgb_raw.r + "/" + rgb_raw.g + "/" + rgb_raw.b);
-        //Serial.println((String)"normalised_value:" + rgb_measured.r + "/" + rgb_measured.g + "/" + rgb_measured.b);
-    
+        RAW_RGB rgb_raw = this->gripper_controller->color_sensor->measure_rgb_raw();
+        Serial.println((String)"raw_value:" + rgb_raw.r + "/" + rgb_raw.g + "/" + rgb_raw.b + "/" + rgb_raw.noise);    
         delay(100);
     }
 }

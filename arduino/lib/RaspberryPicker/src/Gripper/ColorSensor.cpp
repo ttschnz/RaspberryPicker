@@ -10,42 +10,50 @@ ColorSensor::ColorSensor(ColorSensor::Pinout pinout){
 
     pinMode(pinout.ldr, INPUT);
 
-    this->black = RGB{0,0,0};
-    this->white = RGB{1,1,1};
+    this->black = RAW_RGB{0,0,0,0};
+    this->white = RAW_RGB{1,1,1,1};
 }
 
-RGB ColorSensor::measure_rgb_raw(){
-    int led_pins[3] = {
+RAW_RGB ColorSensor::measure_rgb_raw(){
+    int led_pins[] = {
         this->pinout.led_r,
         this->pinout.led_g,
         this->pinout.led_b,
+        0 // special case: we also want to measure ambient light. we'll check if the pin is zero
     };
-    float raw_measurement[3] = {0,0,0};
+    float raw_measurement[] = {0,0,0,0};
 
 
-    for (int color_index = 0; color_index < 3; color_index++){
+    for (int color_index = 0; color_index < 4; color_index++){
         long long int measurement = 0;
-        digitalWrite(led_pins[color_index], HIGH);
+        
+        if (led_pins[color_index] > 0)
+            digitalWrite(led_pins[color_index], HIGH);
+        
         for (int i = 0; i < ColorSensor::measure_count; i++){
             measurement+=analogRead(this->pinout.ldr);
             delay(ColorSensor::delay_probe);
         }
-        digitalWrite(led_pins[color_index], LOW);
+
+        if (led_pins[color_index] > 0)
+            digitalWrite(led_pins[color_index], LOW);
+
         raw_measurement[color_index] = measurement / (float)ColorSensor::measure_count;
         delay(ColorSensor::delay_color);
     }
 
-    RGB out_rgb{
+    RAW_RGB out_rgb{
         .r=raw_measurement[0],
         .g=raw_measurement[1],
-        .b=raw_measurement[2]
+        .b=raw_measurement[2],
+        .noise=raw_measurement[3],
     };
     
     return out_rgb;
 }
 
 RGB ColorSensor::measure_rgb(){
-    RGB raw_rgb = this->measure_rgb_raw();
+    RAW_RGB raw_rgb = this->measure_rgb_raw();
 
     RGB normalised = RGB{
         (raw_rgb.r - this->black.r) / (this->white.r - this->black.r),
@@ -66,11 +74,11 @@ RGB ColorSensor::measure_rgb(){
 void ColorSensor::calibrate(){
     Serial.println("calibrating white");
     delay(ColorSensor::delay_calibrate);
-    RGB raw_white = this->measure_rgb_raw();
+    RAW_RGB raw_white = this->measure_rgb_raw();
 
     Serial.println("calibrating black");
     delay(ColorSensor::delay_calibrate);
-    RGB raw_black = this->measure_rgb_raw();
+    RAW_RGB raw_black = this->measure_rgb_raw();
 
     this->white = raw_white;
     this->black = raw_black;
