@@ -28,6 +28,7 @@ RAW_RGB_3LDR ColorSensor3LDR::measure_rgb_raw(){
 
     // measure_colors with LED
     digitalWrite(this->pinout.led, HIGH);
+    delay(ColorSensor3LDR::delay_led);
     for (int i = 0; i < ColorSensor3LDR::measure_count; i++){
         for (int color_index = 0; color_index < 3; color_index++){
             measurement.illuminated[color_index]+=analogRead(ldr_pins[color_index]);

@@ -27,7 +27,7 @@ class ColorSensor3LDR
 
         static const int measure_count;   // how many measurements should be taken to average?
         static const int delay_probe;     // delay before probing another measurement
-        
+        static const int delay_led;       // delay after switching on led (i.e. ldr settling time)
         /**
          * Initialises the color sensor. Call this during setup
          */

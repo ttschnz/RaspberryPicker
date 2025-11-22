@@ -18,6 +18,7 @@ const int ColorSensor::delay_calibrate = 2000;
 
 const int ColorSensor3LDR::measure_count = 10;
 const int ColorSensor3LDR::delay_probe = 10;
+const int ColorSensor3LDR::delay_led = 200; 
 
 
 const float GripperStepper::transmission_ratio = 1.5 * 18 * PI;
