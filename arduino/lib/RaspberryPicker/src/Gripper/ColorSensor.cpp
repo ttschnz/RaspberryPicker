@@ -29,7 +29,8 @@ RAW_RGB ColorSensor::measure_rgb_raw(){
         
         if (led_pins[color_index] > 0)
             digitalWrite(led_pins[color_index], HIGH);
-        
+        delay(ColorSensor::delay_color);
+
         for (int i = 0; i < ColorSensor::measure_count; i++){
             measurement+=analogRead(this->pinout.ldr);
             delay(ColorSensor::delay_probe);
@@ -39,7 +40,6 @@ RAW_RGB ColorSensor::measure_rgb_raw(){
             digitalWrite(led_pins[color_index], LOW);
 
         raw_measurement[color_index] = measurement / (float)ColorSensor::measure_count;
-        delay(ColorSensor::delay_color);
     }
 
     RAW_RGB out_rgb{
