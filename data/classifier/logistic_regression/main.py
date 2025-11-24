@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from implementation import *
 
 # Load data
-colors_df = pd.read_csv('../data_labeled_ambient.csv',  usecols=["red", "green", "blue", "label"])
+colors_df = pd.read_csv('../data_labeled_ambient.csv',  usecols=["red", "green", "blue", "ambient", "label"])
 
 X_train, y_train, X_test, y_test, feature_names, label_map = preprocess_data(colors_df, label="label", train_size=0.70, seed=12)
 
