@@ -28,6 +28,11 @@ const int GripperStepper::acceleration = 300;
 const float PressureSensor::berry_size_threshold = 25;
 const int PressureSensor::pressure_sensor_thresholds[2] = {5,5};
 
+const double ColorSensor::logistic_regression_w[4] = {0.54324152, -22.18843752, 49.22966720, -34.39813628};
+const double ColorSensor::logistic_regression_b = 1.7564837932259665;
+const double ColorSensor::logistic_regression_mean[4] = {731.14852321, 716.99845288, 717.05119550, 708.79563994};
+const double ColorSensor::logistic_regression_std[4] = {9.98251749, 9.76970894, 9.84973576, 10.85432607};
+
 GripperController::GripperController(GripperPinout *pinout, InterfaceMaster *interface){
     this->interface = interface;
     this->gripper_state = GripperStepper::GripperState::OPEN;
@@ -176,14 +181,17 @@ GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::Gri
 }
 
 bool GripperController::is_ripe(){
-    RGB color = this->color_sensor->measure_rgb();
+    RAW_RGB color = this->color_sensor->measure_rgb_raw();
 
     this->interface->send_state("gripper.ripeness.r", color.r);
     this->interface->send_state("gripper.ripeness.g", color.g);
     this->interface->send_state("gripper.ripeness.b", color.b);
 
-    // TODO: linear regression?
-    // for now: if the red value is higher than both other values combined (*tolerance)
-    // the raspberry is considered ripe.
-    return color.r > (color.b + color.g) * 0.8;
+    double ripeness_p = this->color_sensor->get_ripenesses_p(color);
+    this->interface->send_state("gripper.raspberry_ripeness.p_ripe", ripeness_p);
+    this->interface->send_state("gripper.raspberry_ripeness.p_unripe", 1-ripeness_p);
+
+    // TODO: bias towards one side, the scores arent 50%/50%
+    return ripeness_p > 0.5;
 }
+

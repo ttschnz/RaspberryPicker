@@ -105,9 +105,15 @@ class ControlCenter(ctk.CTk):
         ctk.CTkLabel(self.gripper_frame, text="Ripeness").grid(column=0, row=2, sticky="w", **paddings)
         ctk.CTkEntry(self.gripper_frame, textvariable=self.state_manager.values["gripper.raspberry_ripeness"], state="disabled", width=80).grid(column=1, row=2, **paddings)
 
+        ctk.CTkLabel(self.gripper_frame, text="P_ripe").grid(column=2, row=2, sticky="w", **paddings)
+        ctk.CTkEntry(self.gripper_frame, textvariable=self.state_manager.values["gripper.raspberry_ripeness.p_ripe"], state="disabled", width=80).grid(column=3, row=2, **paddings)
+
+        ctk.CTkLabel(self.gripper_frame, text="P_unripe").grid(column=4, row=2, sticky="w", **paddings)
+        ctk.CTkEntry(self.gripper_frame, textvariable=self.state_manager.values["gripper.raspberry_ripeness.p_unripe"], state="disabled", width=80).grid(column=5, row=2, **paddings)
+
         for i, (color, var) in enumerate([("r", "gripper.ripeness.r"), ("g", "gripper.ripeness.g"), ("b", "gripper.ripeness.b")]):
-            ctk.CTkLabel(self.gripper_frame, text=color).grid(column=2 + i*2, row=2, sticky="w", **paddings)
-            ctk.CTkEntry(self.gripper_frame, textvariable=self.state_manager.values[var], state="disabled", width=50).grid(column=3 + i*2, row=2, **paddings)
+            ctk.CTkLabel(self.gripper_frame, text=color).grid(column=2 + i*2, row=3, sticky="w", **paddings)
+            ctk.CTkEntry(self.gripper_frame, textvariable=self.state_manager.values[var], state="disabled", width=50).grid(column=3 + i*2, row=3, **paddings)
 
         # Basket section
         self.basket_frame = ctk.CTkFrame(self.right_frame)

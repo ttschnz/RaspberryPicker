@@ -87,3 +87,45 @@ void ColorSensor::calibrate(){
     
     Serial.println("calibrated");
 }
+
+
+// double sigmoid(double z){
+//     double s = 1/(1+exp(-z));
+//     return s;
+// }
+double sigmoid(double z){
+    if (z > 50) return 1.0;
+    if (z < -50) return 0.0;
+    if (z >= 0){
+        double e = exp(-z);
+        return 1.0 / (1.0 + e);
+    } else {
+        double e = exp(z);
+        return e / (1.0 + e);
+    }
+}
+
+void normalize(double X[4]){
+    const double *mean = ColorSensor::logistic_regression_mean;
+    const double *std = ColorSensor::logistic_regression_std;
+    for(int i = 0; i<4; i++){
+        X[i] = (X[i] - mean[i]) / std[i];
+    }
+}
+
+double ColorSensor::get_ripenesses_p(RAW_RGB rgb_raw){
+    const double *w = ColorSensor::logistic_regression_w;
+    const double b = ColorSensor::logistic_regression_b;
+
+    double X[] = {rgb_raw.r, rgb_raw.g, rgb_raw.b, rgb_raw.noise};
+    normalize(X);
+
+    double z = w[0]*X[0] + w[1]*X[1] + w[2]*X[2] + w[3]*X[3] + b;
+
+    // label map is 0:ripe, 1:unripe
+    double p_hat_unripe = sigmoid(z);
+
+    double p_hat_ripe = 1-p_hat_unripe;
+
+    return p_hat_ripe;    
+}

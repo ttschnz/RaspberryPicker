@@ -94,15 +94,15 @@ class State:
 
     def update_color_sensor_plot(self):
         if self.fig is None:
-            self.fig = Figure(figsize = (5, 2), dpi = 100)
+            self.fig = Figure(figsize = (5, 3), dpi = 100)
             self.plt = self.fig.add_subplot(111)
             self.canvas = FigureCanvasTkAgg(self.fig,master=self.control_center.gripper_frame)
 
         self.plt.clear()
 
-        self.plt.plot(self.color_sensor_values["r"], color='red', label='Red Line')
-        self.plt.plot(self.color_sensor_values["g"], color='green', label='Green Line')
-        self.plt.plot(self.color_sensor_values["b"], color='blue', label='Blue Line')
+        self.plt.plot(self.color_sensor_values["r"], color='red', label='Red Line', markerfacecolor='red', marker='o')
+        self.plt.plot(self.color_sensor_values["g"], color='green', label='Green Line', markerfacecolor='green', marker='o')
+        self.plt.plot(self.color_sensor_values["b"], color='blue', label='Blue Line', markerfacecolor='blue', marker='o')
 
         self.canvas.draw()
         self.canvas.get_tk_widget().grid(column=0, row=4, sticky=tk.W, columnspan=8,padx=10,pady=5)
