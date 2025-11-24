@@ -18,7 +18,7 @@ class ControlCenter(ctk.CTk):
 
         # Window settings
         self.title("Control Centre")
-        self.geometry("920x550")
+        self.geometry("1200x800")
         self.minsize(700, 550)
         ctk.set_appearance_mode("system")  # or "light"/"dark"
         ctk.set_default_color_theme("green")
