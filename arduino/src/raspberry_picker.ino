@@ -8,27 +8,30 @@
 
 #include <Gripper/ColorSensor.h>
 
-BasketPinout basket_pinout {
-  .sorting_pin = 13,
-  .door_pin = 12,
+BasketPinout basket_pinout{
+    .sorting_pin = 13,
+    .door_pin = 12,
 };
 
-GripperPinout gripper_pinout {
-    .color_sensor_pinout = ColorSensor::Pinout{7,6,5,A5},
-    .stepper_motor_pins = {8,9,10,11},
+GripperPinout gripper_pinout{
+    .color_sensor_pinout = ColorSensor::Pinout{7, 6, 5, A5},
+    .stepper_motor_pins = {8, 9, 10, 11},
     .limit_switch_zero_pin = 4,
     .limit_switch_pressure_pin = 3,
 };
 
-BasketController* basket_controller;
-GripperController* gripper_controller;
-InterfaceMaster* interface_master;
-Controller* controller;
+BasketController *basket_controller;
+GripperController *gripper_controller;
+InterfaceMaster *interface_master;
+Controller *controller;
 
-void setup() {
+void setup()
+{
 
   Serial.begin(9600);
-    while(!Serial){};
+  while (!Serial)
+  {
+  };
 
   Serial.println("initialising");
 
@@ -52,35 +55,38 @@ void setup() {
   Serial.println("interface connected to main controller");
 }
 
-void loop() {
-    switch (controller->get_state()){
-    case Controller::State::IDLE:
-      interface_master->listen_state_change_requests();
+void loop()
+{
+  switch (controller->get_state())
+  {
+  case Controller::State::IDLE:
+    interface_master->listen_state_change_requests();
+    break;
+  case Controller::State::MANUAL:
+    interface_master->listen_state_change_requests();
+    break;
+  case Controller::State::PROGRAM:
+    interface_master->listen_state_change_requests();
+    switch (controller->get_program())
+    {
+    case Controller::Program::CLOSE_GRIPPER:
+      controller->run_close();
       break;
-    case Controller::State::MANUAL:
-      interface_master->listen_state_change_requests();
+    case Controller::Program::RELEASE_GRIPPER:
+      controller->run_release();
       break;
-    case Controller::State::PROGRAM:
-      interface_master->listen_state_change_requests();
-            switch (controller->get_program()){
-        case Controller::Program::CLOSE_GRIPPER:
-          controller->run_close();
-          break;
-        case Controller::Program::RELEASE_GRIPPER:
-          controller->run_release();
-          break;
-        case Controller::Program::EMPTY_BASKET:
-          controller->run_drop();
-          break;
-        case Controller::Program::RESET:
-          controller->run_reset();
-          break;
-        case Controller::Program::MEASURE_COLOR:
-          controller->run_measure_color();
-          break;
-      }
-      controller->set_state(Controller::State::IDLE);
+    case Controller::Program::EMPTY_BASKET:
+      controller->run_drop();
       break;
+    case Controller::Program::RESET:
+      controller->run_reset();
+      break;
+    case Controller::Program::MEASURE_COLOR:
+      controller->run_measure_color();
+      break;
+    }
+    controller->set_state(Controller::State::IDLE);
+    break;
   }
-    delay(100); // for stability
+  delay(100); // for stability
 }
