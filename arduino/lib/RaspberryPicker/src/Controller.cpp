@@ -6,7 +6,6 @@
 
 #include "Gripper/Gripper.h"
 #include "Gripper/GripperStepper.h"
-#include "Gripper/PressureSensor.h"
 Controller::Controller(State state){
     Controller(state, nullptr);
 }
@@ -123,13 +122,6 @@ void Controller::run_reset(){
     this->basket_controller->reset_counter(true);
 }
 
-void Controller::run_measure_pressure(){
-    while (Serial.available()==0){
-        this->gripper_controller->pressure_sensor->is_touching(true);
-        delay(100);
-    }
-}
-
 void Controller::run_measure_color(){
     while (Serial.available()==0){
         RAW_RGB rgb_raw = this->gripper_controller->color_sensor->measure_rgb_raw();
@@ -146,7 +138,6 @@ const char* Controller::serialize_program(Program program){
         "RELEASE_GRIPPER",
         "EMPTY_BASKET",
         "RESET",
-        "MEASURE_PRESSURE",
         "MEASURE_COLOR",
     };
     return program_strings[idx];
@@ -161,8 +152,6 @@ bool Controller::deserialize_program(String program, Controller::Program* out_pr
         *out_program = Controller::Program::EMPTY_BASKET;
     } else if(program== "RESET"){
         *out_program = Controller::Program::RESET;
-    } else if(program == "MEASURE_PRESSURE"){
-        *out_program = Controller::Program::MEASURE_PRESSURE;
     } else if(program == "MEASURE_COLOR"){
         *out_program = Controller::Program::MEASURE_COLOR;
     } else{

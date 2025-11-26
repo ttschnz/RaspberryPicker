@@ -7,7 +7,6 @@
 #include "Gripper.h"
 #include "ColorSensor.h"
 #include "GripperStepper.h"
-#include "PressureSensor.h"
 #include "LimitSwitch.h"
 
 
@@ -19,21 +18,21 @@ const float GripperStepper::transmission_ratio = 1.5 * 18 * PI;
 const int GripperStepper::plate_distance_open = 65;
 const int GripperStepper::plate_distance_large = 30;
 const int GripperStepper::plate_distance_small = 20;
-const int GripperStepper::plate_distance_limit = 15;
+const int GripperStepper::plate_distance_limit = 13;
 const int GripperStepper::steps_per_revolution = 2048*2;
 const int GripperStepper::speed = 200;
 const int GripperStepper::max_speed = 1200;
 const int GripperStepper::acceleration = 300;
-const float PressureSensor::berry_size_threshold = 25;
-const int PressureSensor::pressure_sensor_thresholds[2] = {5,5};
+
+const int GripperController::berry_size_threshold = 25;
 
 GripperController::GripperController(GripperPinout *pinout, InterfaceMaster *interface){
     this->interface = interface;
     this->gripper_state = GripperStepper::GripperState::OPEN;
     this->color_sensor = new ColorSensor(pinout->color_sensor_pinout);
-    this->pressure_sensor = new PressureSensor(pinout->pressure_sensor_pins);
+    this->limit_switch_pressure = new LimitSwitch(pinout->limit_switch_pressure_pin);
     this->plate_distance = GripperStepper::plate_distance_open;
-    this->limit_switch = new LimitSwitch(pinout->limit_switch_pin);
+    this->limit_switch_zero = new LimitSwitch(pinout->limit_switch_zero_pin);
     this->plate_stepper = new AccelStepper(
         AccelStepper::HALF4WIRE,
         pinout->stepper_motor_pins[0],
@@ -82,7 +81,7 @@ GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::Gri
         case GripperStepper::GripperState::CLOSED_LIMIT:
             {
                 this->plate_stepper->moveTo(target_steps);
-                bool limit_switch = false;
+                bool limit_switch_zero = false;
                 int i = 0;
                 do{
                     this->plate_stepper->run();
@@ -95,16 +94,16 @@ GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::Gri
                         this->interface->send_state("gripper.plate_distance", this->plate_distance);
                     }
 
-                    limit_switch = this->limit_switch->is_touching();
+                    limit_switch_zero = this->limit_switch_zero->is_touching();
 
-                } while(!limit_switch && this->plate_stepper->isRunning());
+                } while(!limit_switch_zero && this->plate_stepper->isRunning());
 
-                if (!limit_switch){
+                if (!limit_switch_zero){
                     // the stepper reached the "minimal" position.
                     // we continue at low speed until we hit the limit switch
                     Serial.println((String)+"closed without reaching limit switch. finding zero");
                     this->plate_stepper->setSpeed(-GripperStepper::speed); // negative for closing
-                    while(!this->limit_switch->is_touching()){
+                    while(!this->limit_switch_zero->is_touching()){
                         this->plate_stepper->runSpeed();
                     }
                 }
@@ -118,8 +117,8 @@ GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::Gri
         case GripperStepper::GripperState::CLOSED_SMALL:
             {                
                 this->plate_stepper->moveTo(target_steps);
-                bool touching = false;
-                bool limit_switch = false;
+                bool limit_switch_pressure = false;
+                bool limit_switch_zero = false;
                 int i = 0;
                 do{
                     this->plate_stepper->run();
@@ -132,16 +131,16 @@ GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::Gri
                         this->interface->send_state("gripper.plate_distance", this->plate_distance);
                     }
 
-                    touching = this->pressure_sensor->is_touching(i%10000==0);
-                    limit_switch = this->limit_switch->is_touching();
+                    limit_switch_pressure = this->limit_switch_pressure->is_touching();
+                    limit_switch_zero = this->limit_switch_zero->is_touching();
 
-                } while(!touching && !limit_switch && this->plate_stepper->isRunning());
+                } while(!limit_switch_pressure && !limit_switch_zero && this->plate_stepper->isRunning());
 
 
                 GripperStepper::RaspberrySize size;
                 GripperStepper::GripperState state;
                 
-                if (touching){
+                if (limit_switch_pressure){
                     this->plate_stepper->stop();
                     //while (this->plate_stepper->isRunning()) this->plate_stepper->run(); // decelerate cleanly
 
@@ -149,7 +148,7 @@ GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::Gri
                     int current_position_step = this->plate_stepper->currentPosition();
                     int raspberry_width = GripperStepper::steps_to_mm(current_position_step);
 
-                    if (raspberry_width > PressureSensor::berry_size_threshold){
+                    if (raspberry_width > GripperController::berry_size_threshold){
                         size = GripperStepper::RaspberrySize::LARGE;
                         state = GripperStepper::GripperState::CLOSED_LARGE;
                     }else{

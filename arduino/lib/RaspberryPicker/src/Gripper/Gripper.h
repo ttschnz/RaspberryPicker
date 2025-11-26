@@ -8,14 +8,13 @@
 
 #include "LimitSwitch.h"
 #include "ColorSensor.h"
-#include "PressureSensor.h"
 #include "GripperStepper.h"
 
 typedef struct {
     ColorSensor::Pinout color_sensor_pinout;
-    int pressure_sensor_pins[1];
     int stepper_motor_pins[4];
-    int limit_switch_pin;
+    int limit_switch_zero_pin;
+    int limit_switch_pressure_pin;
 } GripperPinout;
 
 
@@ -52,9 +51,11 @@ class GripperController{
         float plate_distance;
         AccelStepper *plate_stepper;
         InterfaceMaster *interface;
-        LimitSwitch *limit_switch;
-        PressureSensor *pressure_sensor;
+        LimitSwitch *limit_switch_zero;
+        LimitSwitch *limit_switch_pressure;
 
+
+        const static int berry_size_threshold;
     private:
 
         ~GripperController() {

@@ -15,9 +15,9 @@ BasketPinout basket_pinout {
 
 GripperPinout gripper_pinout {
     .color_sensor_pinout = ColorSensor::Pinout{7,6,5,A5},
-    .pressure_sensor_pins = {A4},
     .stepper_motor_pins = {8,9,10,11},
-    .limit_switch_pin = 4,
+    .limit_switch_zero_pin = 4,
+    .limit_switch_pressure_pin = 3,
 };
 
 BasketController* basket_controller;
@@ -74,9 +74,6 @@ void loop() {
           break;
         case Controller::Program::RESET:
           controller->run_reset();
-          break;
-        case Controller::Program::MEASURE_PRESSURE:
-          controller->run_measure_pressure();
           break;
         case Controller::Program::MEASURE_COLOR:
           controller->run_measure_color();

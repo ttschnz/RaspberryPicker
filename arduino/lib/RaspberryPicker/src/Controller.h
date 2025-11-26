@@ -22,7 +22,6 @@ class Controller{
             RELEASE_GRIPPER,
             EMPTY_BASKET,
             RESET,
-            MEASURE_PRESSURE,
             MEASURE_COLOR,
         };
 
@@ -79,12 +78,6 @@ class Controller{
          * - closes the doors of the basket (CLOSED)
          */
         void run_reset();
-        
-        /**
-         * Program MEASURE_PRESSURE:
-         * Used to test the pressure sensor and find okay threshold values
-         */
-        void run_measure_pressure();
 
         /**
          * Program MEASURE_COLOR:
