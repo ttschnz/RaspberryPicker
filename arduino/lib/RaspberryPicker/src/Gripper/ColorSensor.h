@@ -32,10 +32,6 @@ class ColorSensor
         static const int delay_color;     // delay before switching color
         static const int delay_calibrate; // how long do we take to switch from white to black?
 
-        static const double logistic_regression_w[4]; // weight vector for logistic regression
-        static const double logistic_regression_b; // bias for logistic regression
-        static const double logistic_regression_mean[4];
-        static const double logistic_regression_std[4];
         /**
          * Initialises the color sensor. Call this during setup
          */
@@ -63,7 +59,7 @@ class ColorSensor
         */
         RAW_RGB measure_rgb_raw();
 
-        double get_ripenesses_p(RAW_RGB rgb_raw);
+        float get_ripenesses_p(RAW_RGB rgb_raw);
     private:
 
         // reference white reading
