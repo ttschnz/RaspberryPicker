@@ -28,11 +28,10 @@ const int GripperStepper::acceleration = 300;
 const float PressureSensor::berry_size_threshold = 25;
 const int PressureSensor::pressure_sensor_thresholds[2] = {5,5};
 
-const double ColorSensor::logistic_regression_w[4] = {0.54324152, -22.18843752, 49.22966720, -34.39813628};
-const double ColorSensor::logistic_regression_b = 1.7564837932259665;
-const double ColorSensor::logistic_regression_mean[4] = {731.14852321, 716.99845288, 717.05119550, 708.79563994};
-const double ColorSensor::logistic_regression_std[4] = {9.98251749, 9.76970894, 9.84973576, 10.85432607};
-
+const double ColorSensor::logistic_regression_w[4] = {-3.46588566, 2.49935075, 29.67167603, -27.78654977};
+const double ColorSensor::logistic_regression_b = -0.3201968097091611;
+const double ColorSensor::logistic_regression_mean[4] = {700.85248796, 609.74285714, 601.37552167, 579.06677368};
+const double ColorSensor::logistic_regression_std[4] = {89.35265931, 171.05341030, 177.18465448, 185.68888508};
 GripperController::GripperController(GripperPinout *pinout, InterfaceMaster *interface){
     this->interface = interface;
     this->gripper_state = GripperStepper::GripperState::OPEN;
@@ -186,6 +185,7 @@ bool GripperController::is_ripe(){
     this->interface->send_state("gripper.ripeness.r", color.r);
     this->interface->send_state("gripper.ripeness.g", color.g);
     this->interface->send_state("gripper.ripeness.b", color.b);
+    this->interface->send_state("gripper.ripeness.noise", color.noise);
 
     double ripeness_p = this->color_sensor->get_ripenesses_p(color);
     this->interface->send_state("gripper.raspberry_ripeness.p_ripe", ripeness_p);

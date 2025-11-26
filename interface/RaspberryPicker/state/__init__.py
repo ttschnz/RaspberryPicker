@@ -35,7 +35,7 @@ class State:
     def __init__(self, control_center):
         self.control_center = control_center
         self.values = KeyDefaultDict(lambda key: ValueVar(self, self.control_center, value="", name=key))
-        self.color_sensor_values = {"r":[], "g":[], "b":[]}
+        self.color_sensor_values = {"r":[], "g":[], "b":[], "noise":[]}
 
         pass
 
@@ -103,6 +103,7 @@ class State:
         self.plt.plot(self.color_sensor_values["r"], color='red', label='Red Line', markerfacecolor='red', marker='o')
         self.plt.plot(self.color_sensor_values["g"], color='green', label='Green Line', markerfacecolor='green', marker='o')
         self.plt.plot(self.color_sensor_values["b"], color='blue', label='Blue Line', markerfacecolor='blue', marker='o')
+        self.plt.plot(self.color_sensor_values["noise"], color='gray', label='Blue Line', markerfacecolor='gray', marker='o')
 
         self.canvas.draw()
         self.canvas.get_tk_widget().grid(column=0, row=4, sticky=tk.W, columnspan=8,padx=10,pady=5)

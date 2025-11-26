@@ -10,6 +10,14 @@ from implementation import *
 # Load data
 colors_df = pd.read_csv('../data_labeled_ambient.csv',  usecols=["red", "green", "blue", "ambient", "label"])
 
+# # preprocess: don't train on ambient light, but use it to de-noise the color channels
+# colors_df["red"] = colors_df["red"] - colors_df["ambient"]
+# colors_df["green"] = colors_df["green"] - colors_df["ambient"]
+# colors_df["blue"] = colors_df["blue"] - colors_df["ambient"]
+
+# colors_df=colors_df.drop(columns=["ambient"])
+
+# split into train and test dataset
 X_train, y_train, X_test, y_test, feature_names, label_map = preprocess_data(colors_df, label="label", train_size=0.70, seed=12)
 
 # Normalize data

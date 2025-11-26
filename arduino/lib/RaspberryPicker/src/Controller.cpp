@@ -57,14 +57,7 @@ void Controller::add_interface(InterfaceMaster* interface){
 }
 
 void Controller::run_close(){
-    // color sensor
-    bool is_ripe = this->gripper_controller->is_ripe();
-    this->interface->send_state("gripper.raspberry_ripeness", is_ripe ? "RIPE" : "UNRIPE");
-
-    if (!is_ripe){
-        return;
-    }
-
+    
     // close grabbing mechanism
     GripperStepper::RaspberrySize size = this->gripper_controller->set_gripper(GripperStepper::GripperState::CLOSED_LARGE);
     
@@ -81,6 +74,15 @@ void Controller::run_close(){
     }
 
     this->interface->send_state("gripper.raspberry_size", GripperStepper::serialize_raspberry_size(size));
+
+    // color sensor
+    bool is_ripe = this->gripper_controller->is_ripe();
+    this->interface->send_state("gripper.raspberry_ripeness", is_ripe ? "RIPE" : "UNRIPE");
+
+    if (!is_ripe){
+        this->gripper_controller->set_gripper(GripperStepper::GripperState::OPEN);
+        return;
+    }
 
 
     // set sorting to the correct position
