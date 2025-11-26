@@ -24,6 +24,7 @@ const int GripperStepper::max_speed = 1200;
 const int GripperStepper::acceleration = 300;
 
 const int GripperController::berry_size_threshold = 25;
+const int GripperController::picking_delay = 10000;
 
 GripperController::GripperController(GripperPinout *pinout, InterfaceMaster *interface)
 {

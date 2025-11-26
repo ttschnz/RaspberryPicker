@@ -152,6 +152,71 @@ void Controller::run_measure_color()
     }
 }
 
+void Controller::run_pgm1()
+{
+    
+    // close grabbing mechanism
+    GripperStepper::RaspberrySize size = this->gripper_controller->set_gripper(GripperStepper::GripperState::CLOSED_LARGE);
+
+    this->interface->send_state("gripper.raspberry_size", GripperStepper::serialize_raspberry_size(size));
+
+    if (size == GripperStepper::RaspberrySize::UNKNOWN)
+    {
+        size = this->gripper_controller->set_gripper(GripperStepper::GripperState::CLOSED_SMALL);
+    }
+
+    this->interface->send_state("gripper.raspberry_size", GripperStepper::serialize_raspberry_size(size));
+
+    if (size == GripperStepper::RaspberrySize::UNKNOWN)
+    {
+        size = this->gripper_controller->set_gripper(GripperStepper::GripperState::CLOSED_LIMIT);
+    }
+
+    this->interface->send_state("gripper.raspberry_size", GripperStepper::serialize_raspberry_size(size));
+
+    // color sensor
+    bool is_ripe = this->gripper_controller->is_ripe();
+    this->interface->send_state("gripper.raspberry_ripeness", is_ripe ? "RIPE" : "UNRIPE");
+
+    if (!is_ripe)
+    {
+        this->gripper_controller->set_gripper(GripperStepper::GripperState::OPEN);
+        return;
+    }
+
+    // set sorting to the correct position
+    switch (size)
+    {
+    case GripperStepper::RaspberrySize::LARGE:
+        this->basket_controller->set_sorting(BasketSorter::SortingState::LARGE);
+        break;
+    case GripperStepper::RaspberrySize::SMALL:
+        this->basket_controller->set_sorting(BasketSorter::SortingState::SMALL);
+        break;
+    case GripperStepper::RaspberrySize::UNKNOWN:
+        // we have closed the gripper until the limit switch and not felt any touch. abort and re-open.
+        this->gripper_controller->set_gripper(GripperStepper::GripperState::OPEN);
+        break;
+    }
+
+    // wait for the user to pick the berry
+    delay(GripperController::picking_delay);
+
+    // open the gripper, increment the counter in the box and reset sorting
+    this->gripper_controller->set_gripper(GripperStepper::GripperState::OPEN);
+    this->basket_controller->increment_counter();
+    this->basket_controller->set_sorting(BasketSorter::SortingState::IDLE);
+}
+
+
+void Controller::run_pgm2()
+{
+    this->basket_controller->set_door(BasketDoor::DoorState::OPEN);
+    this->basket_controller->reset_counter(false);
+    delay(BasketDoor::delay_ms);
+    this->basket_controller->set_door(BasketDoor::DoorState::CLOSED);
+}
+
 const char *Controller::serialize_program(Program program)
 {
     int idx = static_cast<int>(program);
@@ -162,6 +227,8 @@ const char *Controller::serialize_program(Program program)
         "EMPTY_BASKET",
         "RESET",
         "MEASURE_COLOR",
+        "PROGRAM_1",
+        "PROGRAM_2",
     };
     return program_strings[idx];
 }
@@ -187,6 +254,14 @@ bool Controller::deserialize_program(String program, Controller::Program *out_pr
     else if (program == "MEASURE_COLOR")
     {
         *out_program = Controller::Program::MEASURE_COLOR;
+    }
+    else if (program == "PROGRAM_1")
+    {
+        *out_program = Controller::Program::PROGRAM_1;
+    }
+    else if (program == "PROGRAM_1")
+    {
+        *out_program = Controller::Program::PROGRAM_1;
     }
     else
     {

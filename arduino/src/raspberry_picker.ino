@@ -84,6 +84,12 @@ void loop()
     case Controller::Program::MEASURE_COLOR:
       controller->run_measure_color();
       break;
+    case Controller::Program::PROGRAM_1:
+      controller->run_pgm1();
+      break;
+    case Controller::Program::PROGRAM_2:
+      controller->run_pgm2();
+      break;
     }
     controller->set_state(Controller::State::IDLE);
     break;

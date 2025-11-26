@@ -24,6 +24,8 @@ public:
         EMPTY_BASKET,
         RESET,
         MEASURE_COLOR,
+        PROGRAM_1,
+        PROGRAM_2,
     };
 
     const char *serialize_program(Program program);
@@ -85,6 +87,20 @@ public:
      * Used to test the color sensor and find okay threshold values
      */
     void run_measure_color();
+
+
+    /**
+     * Program 1:
+     * Close gripper and choose to pick or not. wait until picked and then reset.
+     */
+    void run_pgm1();
+
+
+    /**
+     * Program 2:
+     * Empty the basket
+     */
+    void run_pgm2();
 
     State state;
     Program program;

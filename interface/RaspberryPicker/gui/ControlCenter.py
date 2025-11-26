@@ -6,7 +6,7 @@ from RaspberryPicker.state import State
 
 class ControlCenter(ctk.CTk):
     controller_states = ("MANUAL", "IDLE", "PROGRAM")
-    controller_programs = ("CLOSE_GRIPPER", "RELEASE_GRIPPER", "EMPTY_BASKET", "RESET", "MEASURE_COLOR")
+    controller_programs = ("CLOSE_GRIPPER", "RELEASE_GRIPPER", "EMPTY_BASKET", "RESET", "MEASURE_COLOR", "PROGRAM_1", "PROGRAM_2")
     sorting_states = ("LARGE", "SMALL", "IDLE")
     door_states = ("OPEN", "CLOSED")
     gripper_states = ("OPEN", "CLOSED_LIMIT", "CLOSED_LARGE", "CLOSED_SMALL")
@@ -82,6 +82,10 @@ class ControlCenter(ctk.CTk):
             values=list(self.controller_programs)
         )
         self.controller_program_options.grid(column=1, row=1, sticky="w", **paddings)
+
+        ctk.CTkButton(self.controller_frame, text="Program 1", command=print).grid(column=2, row=1, **paddings)
+        ctk.CTkButton(self.controller_frame, text="Program 2", command=print).grid(column=4, row=1, **paddings)
+        
 
         # Gripper section
         self.gripper_frame = ctk.CTkFrame(self.right_frame)
