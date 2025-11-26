@@ -54,6 +54,7 @@ GripperController::GripperController(GripperPinout *pinout, InterfaceMaster *int
 
 GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::GripperState desired_gripper_state){
     int target_steps = GripperStepper::get_desired_step_position(desired_gripper_state);
+    this->plate_stepper->setSpeed(GripperStepper::speed);
     switch (desired_gripper_state){
         case GripperStepper::GripperState::OPEN:
             {
@@ -106,6 +107,8 @@ GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::Gri
                     while(!this->limit_switch_zero->is_touching()){
                         this->plate_stepper->runSpeed();
                     }
+                }else{
+                    this->plate_stepper->setSpeed(0);
                 }
                 this->plate_stepper->setCurrentPosition(
                     GripperStepper::get_desired_step_position(GripperStepper::GripperState::CLOSED_LIMIT)
@@ -141,9 +144,6 @@ GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::Gri
                 GripperStepper::GripperState state;
                 
                 if (limit_switch_pressure){
-                    //this->plate_stepper->stop();
-                    //this->plate_stepper->move(0);
-                    //while (this->plate_stepper->isRunning()) this->plate_stepper->run(); // decelerate cleanly
                     this->plate_stepper->setSpeed(0);
 
                     int current_position_step = this->plate_stepper->currentPosition();
