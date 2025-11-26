@@ -53,11 +53,10 @@ float sigmoid(float x) {
     return 0.5f * (x / (1.0f + fabsf(x)) + 1.0f);
 }
 
-
-const float logistic_regression_w[4]  = {-3.46588566, 2.49935075, 29.67167603, -27.78654977};
-const float logistic_regression_b  = -0.3201968097091611;
-const float logistic_regression_mean[4]  = {700.85248796, 609.74285714, 601.37552167, 579.06677368};
-const float logistic_regression_std[4]  = {89.35265931, 171.05341030, 177.18465448, 185.68888508};
+const float logistic_regression_w[4] = {-2.82726153, -8.91658046, 52.32324727, -38.16793768};
+const float logistic_regression_b = -1.2026309385016440;
+const float logistic_regression_mean[4] = {689.88443114, 587.60494012, 578.94408683, 554.74618263};
+const float logistic_regression_std[4] = {96.15270717, 186.68595658, 192.60221362, 203.43980064};
 
 float ColorSensor::get_ripenesses_p(RAW_RGB rgb_raw){    
     

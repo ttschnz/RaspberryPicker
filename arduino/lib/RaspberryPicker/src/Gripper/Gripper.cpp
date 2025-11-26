@@ -141,9 +141,10 @@ GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::Gri
                 GripperStepper::GripperState state;
                 
                 if (limit_switch_pressure){
-                    this->plate_stepper->stop();
+                    //this->plate_stepper->stop();
+                    //this->plate_stepper->move(0);
                     //while (this->plate_stepper->isRunning()) this->plate_stepper->run(); // decelerate cleanly
-
+                    this->plate_stepper->setSpeed(0);
 
                     int current_position_step = this->plate_stepper->currentPosition();
                     int raspberry_width = GripperStepper::steps_to_mm(current_position_step);
