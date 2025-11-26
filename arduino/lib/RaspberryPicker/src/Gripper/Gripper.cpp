@@ -14,7 +14,6 @@
 const int ColorSensor::measure_count = 10;
 const int ColorSensor::delay_probe = 10;
 const int ColorSensor::delay_color = 200;
-const int ColorSensor::delay_calibrate = 2000;
 
 const float GripperStepper::transmission_ratio = 1.5 * 18 * PI;
 const int GripperStepper::plate_distance_open = 65;

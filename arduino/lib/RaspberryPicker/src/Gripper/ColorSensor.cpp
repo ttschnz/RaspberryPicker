@@ -9,9 +9,6 @@ ColorSensor::ColorSensor(ColorSensor::Pinout pinout){
     pinMode(pinout.led_b, OUTPUT);
 
     pinMode(pinout.ldr, INPUT);
-
-    this->black = RAW_RGB{0,0,0,0};
-    this->white = RAW_RGB{1,1,1,1};
 }
 
 RAW_RGB ColorSensor::measure_rgb_raw(){
@@ -52,43 +49,6 @@ RAW_RGB ColorSensor::measure_rgb_raw(){
     return out_rgb;
 }
 
-RGB ColorSensor::measure_rgb(){
-    RAW_RGB raw_rgb = this->measure_rgb_raw();
-
-    RGB normalised = RGB{
-        (raw_rgb.r - this->black.r) / (this->white.r - this->black.r),
-        (raw_rgb.g - this->black.g) / (this->white.g - this->black.g),
-        (raw_rgb.b - this->black.b) / (this->white.b - this->black.b),
-    };
-
-    // avoid negative values
-    normalised.r = normalised.r < 0 ? 0 : normalised.r;
-    normalised.g = normalised.g < 0 ? 0 : normalised.g;
-    normalised.b = normalised.b < 0 ? 0 : normalised.b;
-
-    return normalised;
-}
-
-
-
-void ColorSensor::calibrate(){
-    Serial.println("calibrating white");
-    delay(ColorSensor::delay_calibrate);
-    RAW_RGB raw_white = this->measure_rgb_raw();
-
-    Serial.println("calibrating black");
-    delay(ColorSensor::delay_calibrate);
-    RAW_RGB raw_black = this->measure_rgb_raw();
-
-    this->white = raw_white;
-    this->black = raw_black;
-    Serial.println((String)"gripper.color.white_calibration=" + raw_white.r + "/" + raw_white.g + "/" + raw_white.b);
-    Serial.println((String)"gripper.color.black_calibration=" + raw_black.r + "/" + raw_black.g + "/" + raw_black.b);
-    
-    Serial.println("calibrated");
-}
-
-
 float sigmoid(float x) {
     return 0.5f * (x / (1.0f + fabsf(x)) + 1.0f);
 }
@@ -119,6 +79,4 @@ float ColorSensor::get_ripenesses_p(RAW_RGB rgb_raw){
     float p_hat_ripe = 1-p_hat_unripe;
 
     return p_hat_ripe;    
-
-    // return 0.1;
 }

@@ -22,7 +22,6 @@ class Controller{
             RELEASE_GRIPPER,
             EMPTY_BASKET,
             RESET,
-            CALIBRATE_COLOR,
             MEASURE_PRESSURE,
             MEASURE_COLOR,
         };
@@ -80,15 +79,7 @@ class Controller{
          * - closes the doors of the basket (CLOSED)
          */
         void run_reset();
-
-        /**
-         * Program CALIBRATE_COLOR:
-         * Used to calibrate the color sensor
-         * - first white
-         * - then black
-         */
-        void run_calibrate_color();
-
+        
         /**
          * Program MEASURE_PRESSURE:
          * Used to test the pressure sensor and find okay threshold values

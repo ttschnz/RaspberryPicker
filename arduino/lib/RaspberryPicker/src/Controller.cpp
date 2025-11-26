@@ -123,11 +123,6 @@ void Controller::run_reset(){
     this->basket_controller->reset_counter(true);
 }
 
-void Controller::run_calibrate_color(){
-    Serial.println("calibrating colors");
-    this->gripper_controller->color_sensor->calibrate();
-}
-
 void Controller::run_measure_pressure(){
     while (Serial.available()==0){
         this->gripper_controller->pressure_sensor->is_touching(true);
@@ -151,7 +146,6 @@ const char* Controller::serialize_program(Program program){
         "RELEASE_GRIPPER",
         "EMPTY_BASKET",
         "RESET",
-        "CALIBRATE_COLOR",
         "MEASURE_PRESSURE",
         "MEASURE_COLOR",
     };
@@ -167,8 +161,6 @@ bool Controller::deserialize_program(String program, Controller::Program* out_pr
         *out_program = Controller::Program::EMPTY_BASKET;
     } else if(program== "RESET"){
         *out_program = Controller::Program::RESET;
-    } else if(program == "CALIBRATE_COLOR"){
-        *out_program = Controller::Program::CALIBRATE_COLOR;
     } else if(program == "MEASURE_PRESSURE"){
         *out_program = Controller::Program::MEASURE_PRESSURE;
     } else if(program == "MEASURE_COLOR"){
