@@ -66,6 +66,17 @@ def sigmoid(z: np.ndarray) -> np.ndarray:
     s = 1 / (1 + np.exp(-z))
     return s
 
+def fast_sigmoid(z: np.ndarray) -> np.ndarray:
+    """ Fast sigmoid function
+
+    Args:
+        z: Input data of shape (N, )
+        
+    Returns:
+        np.ndarray: Fast-Sigmoid of z of shape (N, ), where each value is in [0, 1]
+    """
+    fs = 0.5*(z/(1.0+np.abs(z))+1.0)
+    return fs
 
 def logistic_output(X: np.ndarray, w: np.ndarray, b: float) -> np.ndarray:
     """ Output of logistic regression
@@ -80,6 +91,18 @@ def logistic_output(X: np.ndarray, w: np.ndarray, b: float) -> np.ndarray:
     p_hat = sigmoid(X @ w + np.ones(X.shape[0]) * b)
     return p_hat
 
+def fast_logistic_output(X: np.ndarray, w: np.ndarray, b: float) -> np.ndarray:
+    """ Output of logistic regression using fast_sigmoid
+    
+    Args:
+        X: Dataset of shape (N, d)
+        w: Weights of logistic regression model of shape (d, )
+        b: bias, a scalar
+    Returns:
+        p_hat (np.ndarray): Output of logistic regression of shape (N, )
+    """
+    p_hat = fast_sigmoid(X @ w + np.ones(X.shape[0]) * b)
+    return p_hat
 
 def bce_loss(X: np.ndarray,  y: np.ndarray, w: np.ndarray, b: float) -> float:
     """ Binary cross-entropy loss function

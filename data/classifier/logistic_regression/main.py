@@ -40,7 +40,12 @@ print(f'Training accuracy: {100 * acc:.2f}%')
 p_hat = logistic_output(X_test, w, b)
 acc = accuracy(y_test, classify(p_hat))
 print(f'Testing accuracy: {100 * acc:.2f}%')
+
+p_hat = fast_logistic_output(X_test, w, b)
+acc = accuracy(y_test, classify(p_hat))
+print(f'Testing accuracy with fast_sigmoid: {100 * acc:.2f}%')
 print("------------------")
+
 
 
 
