@@ -83,9 +83,9 @@ class ControlCenter(ctk.CTk):
         )
         self.controller_program_options.grid(column=1, row=1, sticky="w", **paddings)
 
-        ctk.CTkButton(self.controller_frame, text="Program 1", command=print).grid(column=2, row=1, **paddings)
-        ctk.CTkButton(self.controller_frame, text="Program 2", command=print).grid(column=4, row=1, **paddings)
-        
+        ctk.CTkButton(self.controller_frame, text="Program 1", command=lambda: self.state_manager.values["controller.program"].set("PROGRAM_1")).grid(column=2, row=1, **paddings)
+        ctk.CTkButton(self.controller_frame, text="Program 2", command=lambda: self.state_manager.values["controller.program"].set("PROGRAM_2")).grid(column=4, row=1, **paddings)
+
 
         # Gripper section
         self.gripper_frame = ctk.CTkFrame(self.right_frame)
