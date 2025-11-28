@@ -270,9 +270,9 @@ bool Controller::deserialize_program(String program, Controller::Program *out_pr
     {
         *out_program = Controller::Program::PROGRAM_1;
     }
-    else if (program == "PROGRAM_1")
+    else if (program == "PROGRAM_2")
     {
-        *out_program = Controller::Program::PROGRAM_1;
+        *out_program = Controller::Program::PROGRAM_2;
     }
     else
     {
