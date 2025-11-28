@@ -144,10 +144,21 @@ void Controller::run_reset()
 
 void Controller::run_measure_color()
 {
+    int desired_steps_halfopen = GripperStepper::mm_to_steps(32);
     while (Serial.available() == 0)
     {
+        this->gripper_controller->set_gripper(GripperStepper::GripperState::CLOSED_SMALL);
         RAW_RGB rgb_raw = this->gripper_controller->color_sensor->measure_rgb_raw();
-        Serial.println((String) "raw_value:" + rgb_raw.r + "/" + rgb_raw.g + "/" + rgb_raw.b + "/" + rgb_raw.noise);
+        int current_position_step = this->gripper_controller->plate_stepper->currentPosition();
+        int plate_distance = GripperStepper::steps_to_mm(current_position_step);
+        Serial.println((String) "raw_value:" + rgb_raw.r + "/" + rgb_raw.g + "/" + rgb_raw.b + "/" + rgb_raw.noise + "/" + plate_distance);
+        //this->gripper_controller->set_gripper(GripperStepper::GripperState::OPEN);
+        this->gripper_controller->plate_stepper->setSpeed(GripperStepper::speed);
+        this->gripper_controller->plate_stepper->moveTo(desired_steps_halfopen);
+        while (this->gripper_controller->plate_stepper->isRunning())
+        {
+            this->gripper_controller->plate_stepper->run();
+        }
         delay(100);
     }
 }
