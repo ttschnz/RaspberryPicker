@@ -196,18 +196,11 @@ def train_logistic_regression(X: np.ndarray,
     w = np.random.normal(0, 1, size=(X.shape[1], ))
     b = 0
     
-    # Initialize dict with lists to keep track of loss, accuracy, weight and bias evolution
-    logger = {'loss': [], 
-             'acc': [], 
-             'w': [],
-             'b': []
-            }
     loss_previous = None
     no_improvement_count = 0
     
     i = 0
     while i < (max_iters or float("Inf")):
-        i+=1
         # Compute loss, dw, db and update w and b 
         loss = bce_loss(X, y, w, b)
         dw, db = bce_gradient(X, y, w, b)
@@ -215,14 +208,8 @@ def train_logistic_regression(X: np.ndarray,
         w = w - alpha * dw
         b = b - alpha * db
         
-        # Keep track of parameter, loss and accuracy values for each iteration
-        logger['w'].append(w)
-        logger['b'].append(b)
-        logger['loss'].append(loss)
-        p_hat = logistic_output(X, w, b)
-        logger['acc'].append(accuracy(y, classify(p_hat)))
-        
         if (loss_freq !=0) and i % loss_freq == 0:
+            p_hat = logistic_output(X, w, b)
             print(f'Loss at iter {i}: {loss:.5f} (acc: {accuracy(y, classify(p_hat)):.5f})')
 
         if loss_previous is not None:
@@ -236,7 +223,7 @@ def train_logistic_regression(X: np.ndarray,
                     break  # Stop training
         
         loss_previous = loss
-
+        i+=1
     if (loss_freq != 0):
         print('\nFinal loss: {:.5f}'.format(logger['loss'][-1]))
         
