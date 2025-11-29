@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+import time
 
 def normalize(X, mean, std):
     """Normalization of array
@@ -175,7 +176,7 @@ def train_logistic_regression(X: np.ndarray,
                               patience: float = float("inf"),
                               min_delta: float = 0.00001,
                               seed: Optional[int] = None
-                              ) -> Tuple[np.ndarray, float, dict]:
+                              ) -> Tuple[np.ndarray, float]:
     """ Training function for binary class logistic regression using gradient descent
     
     Args:
@@ -198,7 +199,7 @@ def train_logistic_regression(X: np.ndarray,
     
     loss_previous = None
     no_improvement_count = 0
-    
+    start_time = time.time()
     i = 0
     while i < (max_iters or float("Inf")):
         # Compute loss, dw, db and update w and b 
@@ -209,8 +210,11 @@ def train_logistic_regression(X: np.ndarray,
         b = b - alpha * db
         
         if (loss_freq !=0) and i % loss_freq == 0:
+            elapsed_time = time.time() - start_time
+            it_per_sec = loss_freq/elapsed_time if i>0 else 0
+            start_time = time.time()
             p_hat = logistic_output(X, w, b)
-            print(f'Loss at iter {i}: {loss:.5f} (acc: {accuracy(y, classify(p_hat)):.5f})')
+            print(f'Iteration {i}: loss: {loss:.5f}, acc: {100*accuracy(y, classify(p_hat)):.5f}%, speed:{it_per_sec:.2f} it/sec')
 
         if loss_previous is not None:
             improvement = loss_previous - loss
@@ -225,9 +229,9 @@ def train_logistic_regression(X: np.ndarray,
         loss_previous = loss
         i+=1
     if (loss_freq != 0):
-        print('\nFinal loss: {:.5f}'.format(logger['loss'][-1]))
+        print(f'\nFinal loss: {loss_previous:.5f}')
         
-    return w, b, logger
+    return w, b
 
 def penalized_bce_loss(X: np.ndarray,  y: np.ndarray, w: np.ndarray, b: float, lambda_: float) -> float:
     """ Penalized binary cross-entropy loss function

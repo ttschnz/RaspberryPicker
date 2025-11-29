@@ -44,7 +44,7 @@ X_test = normalize(X_test, mean, std)
 
 
 # Train with "normal" logistic regression
-w, b, _ = train_logistic_regression(
+w, b = train_logistic_regression(
     X_train, y_train, 
     max_iters=args.max_iters, 
     alpha=args.alpha, 
