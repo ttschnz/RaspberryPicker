@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from implementation import *
 
 # Load data
-colors_df = pd.read_csv('../data_labeled_ambient.csv',  usecols=["red", "green", "blue", "ambient", "label"])
+colors_df = pd.read_csv('../data_labeled_ambient_width.csv',  usecols=["red", "green", "blue", "ambient", "width", "label"])
 
 # # preprocess: don't train on ambient light, but use it to de-noise the color channels
 # colors_df["red"] = colors_df["red"] - colors_df["ambient"]
