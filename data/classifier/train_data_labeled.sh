@@ -1,0 +1,1 @@
+python logistic_regression/main.py data_labeled.csv  --max_iters 500000 --loss_freq 5000 --patience 1000 --min_delta 0.000000001

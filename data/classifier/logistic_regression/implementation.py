@@ -169,9 +169,13 @@ def accuracy(labels_gt: np.ndarray, labels_pred: np.ndarray) -> float:
 
 def train_logistic_regression(X: np.ndarray, 
                               y: np.ndarray, 
-                              max_iters: int = 101, 
+                              max_iters: Optional[int] = 101, 
                               alpha: float = 0.5, 
-                              loss_freq: int = 0) -> Tuple[np.ndarray, float, dict]:
+                              loss_freq: int = 0,
+                              patience: float = float("inf"),
+                              min_delta: float = 0.00001,
+                              seed: Optional[int] = None
+                              ) -> Tuple[np.ndarray, float, dict]:
     """ Training function for binary class logistic regression using gradient descent
     
     Args:
@@ -188,7 +192,7 @@ def train_logistic_regression(X: np.ndarray,
     """
     
     # Initialize weights
-    np.random.seed(0)
+    np.random.seed(seed)
     w = np.random.normal(0, 1, size=(X.shape[1], ))
     b = 0
     
@@ -198,9 +202,12 @@ def train_logistic_regression(X: np.ndarray,
              'w': [],
              'b': []
             }
+    loss_previous = None
+    no_improvement_count = 0
     
-    
-    for i in range(max_iters):
+    i = 0
+    while i < (max_iters or float("Inf")):
+        i+=1
         # Compute loss, dw, db and update w and b 
         loss = bce_loss(X, y, w, b)
         dw, db = bce_gradient(X, y, w, b)
@@ -216,8 +223,20 @@ def train_logistic_regression(X: np.ndarray,
         logger['acc'].append(accuracy(y, classify(p_hat)))
         
         if (loss_freq !=0) and i % loss_freq == 0:
-            print(f'Loss at iter {i}: {loss:.5f}')
+            print(f'Loss at iter {i}: {loss:.5f} (acc: {accuracy(y, classify(p_hat)):.5f})')
+
+        if loss_previous is not None:
+            improvement = loss_previous - loss
+            if improvement > min_delta:
+                best_loss = loss
+                no_improvement_count = 0
+            else:
+                no_improvement_count += 1
+                if no_improvement_count >= patience:
+                    break  # Stop training
         
+        loss_previous = loss
+
     if (loss_freq != 0):
         print('\nFinal loss: {:.5f}'.format(logger['loss'][-1]))
         

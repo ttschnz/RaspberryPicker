@@ -1,0 +1,1 @@
+python logistic_regression/main.py data_labeled_ambient.csv --patience 150000 --min_delta 0.00000001

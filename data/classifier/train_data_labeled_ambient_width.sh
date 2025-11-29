@@ -1,0 +1,2 @@
+python logistic_regression/main.py data_labeled_ambient_width.csv --patience 1000 --min_delta 0.00001 --max_iters 500000
+    
