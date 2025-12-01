@@ -33,7 +33,7 @@ colors_df = pd.read_csv(args.dataset)
 # colors_df=colors_df.drop(columns=["ambient"])
 
 # split into train and test dataset
-X_train, y_train, X_test, y_test, feature_names, label_map = preprocess_data(colors_df, label="label", train_size=args.train_size, seed=12)
+X_train, y_train, X_test, y_test, feature_names, label_map = preprocess_data(colors_df, label="label", train_size=args.train_size)
 
 # Normalize data
 mean = X_train.mean(axis=0)
