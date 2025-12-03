@@ -1,3 +1,14 @@
+/**
+ * Gripper.h
+ * 
+ * Gripper controller for the Raspberry Picker.
+ * Manages the gripper mechanism including:
+ * - Stepper motor control for gripper plate movement
+ * - Color sensor for ripeness detection
+ * - Limit switches for position detection and raspberry contact
+ * - Size detection based on gripper closure distance
+ */
+
 #ifndef RASPBERRY_PICKER_GRIPPER_H
 #define RASPBERRY_PICKER_GRIPPER_H
 
@@ -10,53 +21,66 @@
 #include "ColorSensor.h"
 #include "GripperStepper.h"
 
+/**
+ * GripperPinout structure - defines pin assignments for gripper components.
+ */
 typedef struct
 {
-    ColorSensor::Pinout color_sensor_pinout;
-    int stepper_motor_pins[4];
-    int limit_switch_zero_pin;
-    int limit_switch_pressure_pin;
+    ColorSensor::Pinout color_sensor_pinout;  // Pins for color sensor (RGB LEDs and LDR)
+    int stepper_motor_pins[4];                // Pins for stepper motor (4-wire configuration)
+    int limit_switch_zero_pin;                // Pin for zero position limit switch
+    int limit_switch_pressure_pin;            // Pin for pressure detection limit switch
 } GripperPinout;
 
+/**
+ * GripperController class - controls gripper mechanism and sensors.
+ * Manages stepper motor, color sensor, and limit switches for raspberry detection and handling.
+ */
 class GripperController
 {
 public:
     /**
-     * Initialises the controller for the gripper subcontroller. This also
-     * initialises all subcomponents of this controller, such as sensors and
-     * motors.
+     * Constructor - initializes the gripper controller with all sensors and motors.
+     * Initializes all subcomponents: color sensor, limit switches, and stepper motor.
      * Call this during setup.
      */
     GripperController(GripperPinout *pinout, InterfaceMaster *interface);
 
     /**
-     * sets the gripper to a certain state:
-     * - Open: calculates how many steps need to be done in order to be open
-     * - Close: closes the gripper in small intervals and measures each time
-     *          if we are allready touching the berry or not. It then
-     *          evaluates the size of the berry we are touching and returns
-     *          the more likely size.
+     * Sets the gripper to a specified state and detects raspberry size.
+     * 
+     * Behavior varies by desired state:
+     * - OPEN: Fully opens gripper
+     * - CLOSED_LIMIT: Closes until limit switch or pressure plate activated
+     * - CLOSED_SMALL/LARGE: Closes to specific position, detecting raspberry if present
+     * 
+     * @param desired_gripper_state Target gripper state
+     * @return Detected raspberry size (LARGE, SMALL, or UNKNOWN)
      */
     GripperStepper::RaspberrySize set_gripper(GripperStepper::GripperState desired_gripper_state);
 
     /**
-     * returns true if the color sensor thinks the berry is ripe.
-     * returns false if not
+     * Determines if the currently held raspberry is ripe.
+     * Uses color sensor to measure RGB values and applies ripeness detection model.
+     * @return true if the raspberry is ripe, false if unripe
      */
     bool is_ripe();
 
-    ColorSensor *color_sensor;
-    GripperStepper::GripperState gripper_state;
-    float plate_distance;
-    AccelStepper *plate_stepper;
-    InterfaceMaster *interface;
-    LimitSwitch *limit_switch_zero;
-    LimitSwitch *limit_switch_pressure;
+    ColorSensor *color_sensor;                      // Pointer to color sensor
+    GripperStepper::GripperState gripper_state;     // Current gripper state
+    float plate_distance;                           // Current distance between gripper plates [mm]
+    AccelStepper *plate_stepper;                    // Pointer to stepper motor controller
+    InterfaceMaster *interface;                     // Pointer to interface master
+    LimitSwitch *limit_switch_zero;                 // Pointer to zero position limit switch
+    LimitSwitch *limit_switch_pressure;             // Pointer to pressure detection limit switch
 
-    const static int berry_size_threshold_mm;
-    const static int picking_delay_ms;
+    const static int berry_size_threshold_mm;       // Threshold between small and large raspberries [mm]
+    const static int picking_delay_ms;              // Maximum wait time for user to pick raspberry [ms]
 
 private:
+    /**
+     * Destructor - prevents memory leak by cleaning up stepper motor.
+     */
     ~GripperController()
     {
         delete plate_stepper; // prevent memory leak

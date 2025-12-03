@@ -1,3 +1,11 @@
+/**
+ * Basket.cpp
+ * 
+ * Implementation of the basket controller for the Raspberry Picker.
+ * Manages the basket door servo (for emptying) and sorting servo (for size separation).
+ * Tracks fill counts for small and large raspberry compartments.
+ */
+
 #include <Arduino.h>
 #include <Servo.h>
 
@@ -7,15 +15,22 @@
 #include "Door.h"
 #include "Sorting.h"
 
-const int BasketSorter::small_pos = 20;
-const int BasketSorter::idle_pos = 86;
-const int BasketSorter::large_pos = 152;
+// Sorting servo position constants (in degrees)
+const int BasketSorter::small_pos = 20;   // Position to direct raspberries to small compartment
+const int BasketSorter::idle_pos = 86;    // Neutral/idle position
+const int BasketSorter::large_pos = 152;  // Position to direct raspberries to large compartment
 
-const int BasketDoor::closed_pos = 170;
-const int BasketDoor::open_pos = 10;
-const int BasketDoor::max_fill = 23;
-const int BasketDoor::delay_ms = 10000;
+// Door servo position constants (in degrees)
+const int BasketDoor::closed_pos = 170;  // Position when door is closed
+const int BasketDoor::open_pos = 10;     // Position when door is open
+const int BasketDoor::max_fill = 23;     // Maximum fill count before basket should be emptied
+const int BasketDoor::delay_ms = 10000;  // Time to wait for basket to empty (10 seconds)
 
+/**
+ * Constructor - initializes basket controller with pin configuration.
+ * @param pinout Pointer to BasketPinout structure with pin assignments
+ * @param interface Pointer to InterfaceMaster for state communication
+ */
 BasketController::BasketController(BasketPinout *pinout, InterfaceMaster *interface)
 {
     this->interface = interface;
@@ -31,11 +46,16 @@ BasketController::BasketController(BasketPinout *pinout, InterfaceMaster *interf
     pinMode(pinout->door_pin, OUTPUT);
     pinMode(pinout->sorting_pin, OUTPUT);
 
-    // Initialize position variables
+    // Initialize servos to default positions
     this->set_sorting(BasketSorter::SortingState::IDLE);
     this->set_door(BasketDoor::DoorState::CLOSED);
 }
 
+/**
+ * Gets the desired servo position for a given door state.
+ * @param new_door_state Desired door state
+ * @return Servo position in degrees
+ */
 int BasketController::get_desired_door_pos(BasketDoor::DoorState new_door_state)
 {
     int desired_pos;
@@ -53,6 +73,10 @@ int BasketController::get_desired_door_pos(BasketDoor::DoorState new_door_state)
     return desired_pos;
 }
 
+/**
+ * Sets the basket door to the specified state.
+ * @param target_state Desired door state (OPEN or CLOSED)
+ */
 void BasketController::set_door(BasketDoor::DoorState target_state)
 {
     int target_position = this->get_desired_door_pos(target_state);
@@ -62,6 +86,11 @@ void BasketController::set_door(BasketDoor::DoorState target_state)
     this->interface->send_state("basket.door.position", target_position);
 }
 
+/**
+ * Resets the fill counters for both compartments.
+ * @param force If true, resets regardless of door state. If false, only resets when door is open.
+ * @return true if counters were reset, false otherwise
+ */
 bool BasketController::reset_counter(bool force)
 {
     bool reset = (this->door_state == BasketDoor::DoorState::OPEN) || force;
@@ -77,6 +106,11 @@ bool BasketController::reset_counter(bool force)
     return reset;
 }
 
+/**
+ * Gets the desired servo position for a given sorting state.
+ * @param new_sorting_state Desired sorting state
+ * @return Servo position in degrees
+ */
 int BasketController::get_desired_sorting_pos(BasketSorter::SortingState new_sorting_state)
 {
     int desired_pos;
@@ -96,6 +130,10 @@ int BasketController::get_desired_sorting_pos(BasketSorter::SortingState new_sor
     return desired_pos;
 }
 
+/**
+ * Sets the sorting mechanism to the specified state.
+ * @param target_state Desired sorting state (IDLE, SMALL, or LARGE)
+ */
 void BasketController::set_sorting(BasketSorter::SortingState target_state)
 {
     int target_position = this->get_desired_sorting_pos(target_state);
@@ -105,11 +143,16 @@ void BasketController::set_sorting(BasketSorter::SortingState target_state)
     this->interface->send_state("basket.sorting.position", target_position);
 }
 
+/**
+ * Increments the fill counter for the currently active compartment.
+ * @return true if counter was incremented, false if sorting is in IDLE state
+ */
 bool BasketController::increment_counter()
 {
     switch (this->sorting_state)
     {
     case BasketSorter::SortingState::IDLE:
+        // Cannot increment when not actively sorting
         return false;
         break;
     case BasketSorter::SortingState::SMALL:
