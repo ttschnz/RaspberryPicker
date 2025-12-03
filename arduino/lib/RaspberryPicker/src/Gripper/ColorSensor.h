@@ -44,8 +44,8 @@ public:
      * raw reading values no matter wether the sensor is calibrated or not.
      */
     RAW_RGB measure_rgb_raw();
-
-    float get_ripenesses_p(RAW_RGB rgb_raw);
+    
+    float get_ripenesses_p(RAW_RGB rgb_raw, int width);
 
 private:
     Pinout pinout;

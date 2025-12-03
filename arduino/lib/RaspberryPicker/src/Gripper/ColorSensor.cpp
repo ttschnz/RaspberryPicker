@@ -57,24 +57,26 @@ float sigmoid(float x)
     return 0.5f * (x / (1.0f + fabsf(x)) + 1.0f);
 }
 
-const float logistic_regression_w[4] = {-2.82726153, -8.91658046, 52.32324727, -38.16793768};
-const float logistic_regression_b = -1.2026309385016440;
-const float logistic_regression_mean[4] = {689.88443114, 587.60494012, 578.94408683, 554.74618263};
-const float logistic_regression_std[4] = {96.15270717, 186.68595658, 192.60221362, 203.43980064};
+const float logistic_regression_w[] = {-4.50230706, 11.26159486, 3.55473385, -6.83999956, -0.52119049};
+const float logistic_regression_b = -0.2995281290741155;
+const float logistic_regression_mean[] = {648.86074332, 440.45632985, 412.50301974, 353.28095238, 25.94192799};
+const float logistic_regression_std[] = {117.48639278, 171.45333209, 172.45127903, 181.21577300, 4.11776362};
 
-float ColorSensor::get_ripenesses_p(RAW_RGB rgb_raw)
+float ColorSensor::get_ripenesses_p(RAW_RGB rgb_raw, int width)
 {
 
     float X0 = (rgb_raw.r - (logistic_regression_mean[0])) / (logistic_regression_std[0]);
     float X1 = (rgb_raw.g - (logistic_regression_mean[1])) / (logistic_regression_std[1]);
     float X2 = (rgb_raw.b - (logistic_regression_mean[2])) / (logistic_regression_std[2]);
     float X3 = (rgb_raw.noise - (logistic_regression_mean[3])) / (logistic_regression_std[3]);
+    float X4 = (width - (logistic_regression_mean[4])) / (logistic_regression_std[4]);
 
     float z =
         logistic_regression_w[0] * X0 +
         logistic_regression_w[1] * X1 +
         logistic_regression_w[2] * X2 +
         logistic_regression_w[3] * X3 +
+        logistic_regression_w[4] * X4 +
         logistic_regression_b;
 
     // label map is 0:ripe, 1:unripe

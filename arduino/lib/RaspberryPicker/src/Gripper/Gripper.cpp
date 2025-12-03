@@ -193,7 +193,9 @@ bool GripperController::is_ripe()
     this->interface->send_state("gripper.ripeness.b", color.b);
     this->interface->send_state("gripper.ripeness.noise", color.noise);
 
-    float ripeness_p = this->color_sensor->get_ripenesses_p(color);
+    int current_position_step = this->plate_stepper->currentPosition();
+    int plate_distance = GripperStepper::steps_to_mm(current_position_step);
+    float ripeness_p = this->color_sensor->get_ripenesses_p(color, plate_distance);
     this->interface->send_state("gripper.raspberry_ripeness.p_ripe", ripeness_p);
     this->interface->send_state("gripper.raspberry_ripeness.p_unripe", 1 - ripeness_p);
 
