@@ -53,8 +53,8 @@ public:
     LimitSwitch *limit_switch_zero;
     LimitSwitch *limit_switch_pressure;
 
-    const static int berry_size_threshold;
-    const static int picking_delay;
+    const static int berry_size_threshold_mm;
+    const static int picking_delay_ms;
 
 private:
     ~GripperController()

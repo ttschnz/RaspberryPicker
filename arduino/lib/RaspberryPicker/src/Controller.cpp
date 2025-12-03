@@ -166,7 +166,7 @@ void Controller::run_measure_color()
 void Controller::run_pgm1()
 {
     
-    // close grabbing mechanism
+    // close grabbing mechanism until we get a berry size.
     GripperStepper::RaspberrySize size = this->gripper_controller->set_gripper(GripperStepper::GripperState::CLOSED_LARGE);
 
     this->interface->send_state("gripper.raspberry_size", GripperStepper::serialize_raspberry_size(size));
@@ -185,7 +185,7 @@ void Controller::run_pgm1()
 
     this->interface->send_state("gripper.raspberry_size", GripperStepper::serialize_raspberry_size(size));
 
-    // color sensor
+    // ripeness detection
     bool is_ripe = this->gripper_controller->is_ripe();
     this->interface->send_state("gripper.raspberry_ripeness", is_ripe ? "RIPE" : "UNRIPE");
 
@@ -196,22 +196,32 @@ void Controller::run_pgm1()
     }
 
     // set sorting to the correct position
+    // for unknown size: we reached the limit switch without finding a raspberry. so we guess that the size is small
     switch (size)
     {
     case GripperStepper::RaspberrySize::LARGE:
         this->basket_controller->set_sorting(BasketSorter::SortingState::LARGE);
         break;
+    case GripperStepper::RaspberrySize::UNKNOWN: 
     case GripperStepper::RaspberrySize::SMALL:
         this->basket_controller->set_sorting(BasketSorter::SortingState::SMALL);
         break;
-    case GripperStepper::RaspberrySize::UNKNOWN:
-        // we have closed the gripper until the limit switch and not felt any touch. abort and re-open.
-        this->gripper_controller->set_gripper(GripperStepper::GripperState::OPEN);
-        break;
     }
 
-    // wait for the user to pick the berry
-    delay(GripperController::picking_delay);
+    // wait for the user to pick the berry. As soon as the pressure plate looses contact or a 
+    // certain amount of time has passed, we continue.
+    // if the size is unknown, we never got any signal on the pressure plate, so we don't wait
+    // for it to disappear again. In this case we just wait the predefined time.
+    int delayed_time_ms = 0;
+    bool berry_is_touching = true;
+    do {
+        if (size != GripperStepper::RaspberrySize::UNKNOWN){
+            berry_is_touching = this->gripper_controller->limit_switch_pressure->is_touching();
+        }
+        delay(100);
+        delayed_time_ms+=100;
+
+    } while (delayed_time_ms < GripperController::picking_delay_ms && berry_is_touching);
 
     // open the gripper, increment the counter in the box and reset sorting
     this->gripper_controller->set_gripper(GripperStepper::GripperState::OPEN);

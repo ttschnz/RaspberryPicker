@@ -23,8 +23,8 @@ const int GripperStepper::speed = 200;
 const int GripperStepper::max_speed = 1200;
 const int GripperStepper::acceleration = 300;
 
-const int GripperController::berry_size_threshold = 25;
-const int GripperController::picking_delay = 10000;
+const int GripperController::berry_size_threshold_mm = 25;
+const int GripperController::picking_delay_ms = 10000;
 
 GripperController::GripperController(GripperPinout *pinout, InterfaceMaster *interface)
 {
@@ -115,7 +115,7 @@ GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::Gri
             int current_position_step = this->plate_stepper->currentPosition();
             int raspberry_width = GripperStepper::steps_to_mm(current_position_step);
 
-            if (raspberry_width > GripperController::berry_size_threshold)
+            if (raspberry_width > GripperController::berry_size_threshold_mm)
             {
                 size = GripperStepper::RaspberrySize::LARGE;
                 state = GripperStepper::GripperState::CLOSED_LARGE;
@@ -190,7 +190,7 @@ GripperStepper::RaspberrySize GripperController::set_gripper(GripperStepper::Gri
             int current_position_step = this->plate_stepper->currentPosition();
             int raspberry_width = GripperStepper::steps_to_mm(current_position_step);
 
-            if (raspberry_width > GripperController::berry_size_threshold)
+            if (raspberry_width > GripperController::berry_size_threshold_mm)
             {
                 size = GripperStepper::RaspberrySize::LARGE;
                 state = GripperStepper::GripperState::CLOSED_LARGE;
