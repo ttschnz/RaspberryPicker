@@ -25,19 +25,6 @@ struct RAW_RGB
 };
 
 /**
- * RGB structure - normalized color values.
- * r: Red component
- * g: Green component
- * b: Blue component
- */
-struct RGB
-{
-    float r;
-    float g;
-    float b;
-};
-
-/**
  * ColorSensor class - manages RGB color sensing and ripeness detection.
  * Uses RGB LEDs and LDR to measure reflected light for color analysis.
  */
