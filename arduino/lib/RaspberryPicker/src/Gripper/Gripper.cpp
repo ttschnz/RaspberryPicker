@@ -37,7 +37,7 @@ const int GripperStepper::max_speed = 1200;                      // Maximum spee
 const int GripperStepper::acceleration = 300;                    // Acceleration rate (steps/sec²)
 
 // Gripper controller constants
-const int GripperController::berry_size_threshold_mm = 25;  // Threshold between small and large raspberries (mm)
+const int GripperController::berry_size_threshold_mm = 21;  // Threshold between small and large raspberries (mm)
 const int GripperController::picking_delay_ms = 10000;      // Maximum wait time for user to pick raspberry (ms)
 
 /**
