@@ -55,9 +55,11 @@ class State:
 
         if self.arduino.is_open == False:
             return False
-
-        if self.arduino.in_waiting==0:
-            return False
+        try:
+            if self.arduino.in_waiting==0:
+                return False
+        except (OSError, serial.SerialException):
+            self.set_port(self.port) # try to reconnect after error
 
         while (self.arduino.in_waiting>0):
             try:
